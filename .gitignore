@@ -1,0 +1,10 @@
+
+.DS_Store
+.idea/artifacts/Math_jar.xml
+.idea/workspace.xml
+out/.DS_Store
+out/artifacts/.DS_Store
+out/artifacts/Math_jar/Math.jar
+out/production/.DS_Store
+out/production/Math/.DS_Store
+src/.DS_Store
