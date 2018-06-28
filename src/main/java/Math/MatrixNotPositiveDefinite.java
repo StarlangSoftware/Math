@@ -1,12 +1,20 @@
 package Math;
 
-public class MatrixNotPositiveDefinite extends Exception{
+public class MatrixNotPositiveDefinite extends Exception {
 
-    public MatrixNotPositiveDefinite(){
+    /**
+     * An empty constructor of {@link MatrixNotPositiveDefinite} class.
+     */
+    public MatrixNotPositiveDefinite() {
 
     }
 
-    public String toString(){
+    /**
+     * The overridden toString method returns 'Matrix should be positive definite' String.
+     *
+     * @return 'Matrix should be positive definite' String.
+     */
+    public String toString() {
         return "Matrix should be positive definite.";
     }
 
