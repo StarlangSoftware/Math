@@ -2,11 +2,19 @@ package Math;
 
 public class DeterminantZero extends Exception {
 
-    public DeterminantZero(){
+    /**
+     * An empty constructor of {@link DeterminantZero} class.
+     */
+    public DeterminantZero() {
 
     }
 
-    public String toString(){
+    /**
+     * The overridden toString method returns 'Determinant of matrix is zero' String.
+     *
+     * @return 'Determinant of matrix is zero' String.
+     */
+    public String toString() {
         return "Determinant of matrix is zero.";
     }
 }
