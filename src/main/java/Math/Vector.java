@@ -348,7 +348,7 @@ public class Vector implements Serializable {
     }
 
     /**
-     * The l1Normalize method is used to apply Least Squares, it accumulates second power of each items of values {@link ArrayList}
+     * The l2Norm method is used to apply Least Squares, it accumulates second power of each items of values {@link ArrayList}
      * and returns the square root of this summation.
      *
      * @return square root of this summation.
