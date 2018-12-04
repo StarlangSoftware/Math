@@ -58,7 +58,7 @@ public class Matrix implements Serializable {
      *
      * @param row is used to create matrix.
      * @param col is used to create matrix.
-     * @param min minumum value.
+     * @param min minimum value.
      * @param max maximum value.
      */
     public Matrix(int row, int col, double min, double max) {
@@ -409,7 +409,7 @@ public class Matrix implements Serializable {
      * {@link Matrix}. If the size of Matrix's row size and values {@link java.lang.reflect.Array}'s column size do not match,
      * it throws {@link MatrixRowColumnMismatch} exception.
      *
-     * @param m Matrx type input.
+     * @param m Matrix type input.
      * @return result {@link Matrix}.
      * @throws MatrixRowColumnMismatch if row and column size does not match.
      */
@@ -478,8 +478,12 @@ public class Matrix implements Serializable {
      * The trace method accumulates items of values {@link java.lang.reflect.Array} at the diagonal.
      *
      * @return sum of items at diagonal.
+     * @throws MatrixNotSquare if row and column sizes do not match.
      */
-    public double trace() {
+    public double trace() throws MatrixNotSquare{
+        if (row != col){
+            throw new MatrixNotSquare();
+        }
         int i;
         double sum = 0.0;
         for (i = 0; i < row; i++) {
@@ -526,12 +530,16 @@ public class Matrix implements Serializable {
     }
 
     /**
-     * The isSymmetric method compares each item of values {@link java.lang.reflect.Array} at positions (i,j) with (j,i)
+     * The isSymmetric method compares each item of values {@link java.lang.reflect.Array} at positions (i, j) with (j, i)
      * and returns true if they are equal, false otherwise.
      *
      * @return true if items are equal, false otherwise.
+     * @throws MatrixNotSquare if row and column sizes do not match.
      */
-    public boolean isSymmetric() {
+    public boolean isSymmetric() throws MatrixNotSquare {
+        if (row != col){
+            throw new MatrixNotSquare();
+        }
         for (int i = 0; i < row - 1; i++) {
             for (int j = i + 1; j < row; j++) {
                 if (values[i][j] != values[j][i]) {
@@ -548,8 +556,12 @@ public class Matrix implements Serializable {
      * new {@link java.lang.reflect.Array}.
      *
      * @return determinant of values {@link java.lang.reflect.Array}.
+     * @throws MatrixNotSquare if row and column sizes do not match.
      */
-    public double determinant() {
+    public double determinant() throws MatrixNotSquare {
+        if (row != col){
+            throw new MatrixNotSquare();
+        }
         int i, j, k;
         double ratio, det = 1.0;
         double[][] copy = new double[row][col];
@@ -573,8 +585,12 @@ public class Matrix implements Serializable {
      * The inverse method finds the inverse of values {@link java.lang.reflect.Array}.
      *
      * @throws DeterminantZero exception.
+     * @throws MatrixNotSquare if row and column sizes do not match.
      */
-    public void inverse() throws DeterminantZero {
+    public void inverse() throws DeterminantZero, MatrixNotSquare {
+        if (row != col){
+            throw new MatrixNotSquare();
+        }
         double big;
         double dum, pivinv;
         int i, icol, irow, j, k, l, ll;
@@ -652,7 +668,7 @@ public class Matrix implements Serializable {
      * @throws MatrixNotSymmetric        if values {@link ArrayList} is not symmetric
      * @throws MatrixNotPositiveDefinite if the summation is negative.
      */
-    public Matrix choleskyDecomposition() throws MatrixNotSymmetric, MatrixNotPositiveDefinite {
+    public Matrix choleskyDecomposition() throws MatrixNotSymmetric, MatrixNotPositiveDefinite, MatrixNotSquare {
         int i, j, k;
         double sum;
         if (!isSymmetric()) {
@@ -699,7 +715,7 @@ public class Matrix implements Serializable {
      * @return a sorted {@link ArrayList} of {@link Eigenvector}s.
      * @throws MatrixNotSymmetric exception if it is not symmetric.
      */
-    public ArrayList<Eigenvector> characteristics() throws MatrixNotSymmetric {
+    public ArrayList<Eigenvector> characteristics() throws MatrixNotSymmetric, MatrixNotSquare {
         int j, iq, ip, i;
         double threshold, theta, tau, t, sm, s, h, g, c;
         if (!isSymmetric()) {
