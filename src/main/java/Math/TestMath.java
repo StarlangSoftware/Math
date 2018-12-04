@@ -25,6 +25,7 @@ public class TestMath {
         try {
             ArrayList<Eigenvector> result = m.characteristics();
         } catch (MatrixNotSymmetric matrixNotSymmetric) {
+        } catch (MatrixNotSquare matrixNotSquare) {
         }
     }
 }
