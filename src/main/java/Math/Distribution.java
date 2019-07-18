@@ -1,16 +1,16 @@
 package Math;
 
 public class Distribution {
-    final static double Z_MAX = 6.0;
-    final static double Z_EPSILON = 0.000001;
-    final static double CHI_EPSILON = 0.000001;
-    final static double CHI_MAX = 99999.0;
-    final static double LOG_SQRT_PI = 0.5723649429247000870717135;
-    final static double I_SQRT_PI = 0.5641895835477562869480795;
-    final static double BIGX = 200.0;
-    final static double I_PI = 0.3183098861837906715377675;
-    final static double F_EPSILON = 0.000001;
-    final static double F_MAX = 9999.0;
+    private final static double Z_MAX = 6.0;
+    private final static double Z_EPSILON = 0.000001;
+    private final static double CHI_EPSILON = 0.000001;
+    private final static double CHI_MAX = 99999.0;
+    private final static double LOG_SQRT_PI = 0.5723649429247000870717135;
+    private final static double I_SQRT_PI = 0.5641895835477562869480795;
+    private final static double BIGX = 200.0;
+    private final static double I_PI = 0.3183098861837906715377675;
+    private final static double F_EPSILON = 0.000001;
+    private final static double F_MAX = 9999.0;
 
     /**
      * The ex method takes a double x as an input, if x is less than -BIGX it returns 0, otherwise it returns Euler's number
@@ -97,10 +97,10 @@ public class Distribution {
     }
 
     /**
-     * The zInverse method returns the Z-Inverse of given input value.
+     * The zInverse method returns the Z-Inverse of given probability value.
      *
-     * @param p double input.
-     * @return the Z-Inverse of given input value.
+     * @param p double probability.
+     * @return the Z-Inverse of given probability.
      */
     public static double zInverse(double p) {
         double minz = -Z_MAX;
@@ -188,11 +188,11 @@ public class Distribution {
     }
 
     /**
-     * The chiSquareInverse method returns the Chi Square-Inverse of given input value with given degree of freedom.
+     * The chiSquareInverse method returns the Chi Square-Inverse of given probability value with given degree of freedom.
      *
-     * @param p       double input.
+     * @param p       double probability.
      * @param freedom integer input for degrees of freedom.
-     * @return the Z-Inverse of given input value.
+     * @return the chiSquare-Inverse of given probability.
      */
     public static double chiSquareInverse(double p, int freedom) {
         double minchisq = 0.0;
@@ -293,12 +293,12 @@ public class Distribution {
     }
 
     /**
-     * The fDistributionInverse method returns the F-Distribution Inverse of given input value.
+     * The fDistributionInverse method returns the F-Distribution Inverse of given probability value.
      *
-     * @param p        double input.
+     * @param p        double probability.
      * @param freedom1 integer input for degrees of freedom.
      * @param freedom2 integer input for degrees of freedom.
-     * @return the F-Distribution Inverse of given input value.
+     * @return the F-Distribution Inverse of given probability.
      */
     public static double fDistributionInverse(double p, int freedom1, int freedom2) {
         double fval;
@@ -339,11 +339,11 @@ public class Distribution {
     }
 
     /**
-     * The tDistributionInverse method returns the T-Distribution Inverse of given input value.
+     * The tDistributionInverse method returns the T-Distribution Inverse of given probability value.
      *
-     * @param p       double input.
+     * @param p       double probability.
      * @param freedom integer input for degrees of freedom.
-     * @return the T-Distribution Inverse of given input value.
+     * @return the T-Distribution Inverse of given probability.
      */
     public static double tDistributionInverse(double p, int freedom) {
         if (p < 0.5) {
