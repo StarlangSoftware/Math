@@ -510,22 +510,22 @@ public class Matrix implements Serializable {
     }
 
     /**
-     * The partial method takes 4 integer inputs; rowstart, rowend, colstart, colend and creates a {@link Matrix} size of
-     * rowend - rowstart + 1 x colend - colstart + 1. Then, puts corresponding items of values {@link java.lang.reflect.Array}
+     * The partial method takes 4 integer inputs; rowStart, rowEnd, colStart, colEnd and creates a {@link Matrix} size of
+     * rowEnd - rowStart + 1 x colEnd - colStart + 1. Then, puts corresponding items of values {@link java.lang.reflect.Array}
      * to the new result {@link Matrix}.
      *
-     * @param rowstart integer input for defining starting index of row.
-     * @param rowend   integer input for defining ending index of row.
-     * @param colstart integer input for defining starting index of column.
-     * @param colend   integer input for defining ending index of column.
+     * @param rowStart integer input for defining starting index of row.
+     * @param rowEnd   integer input for defining ending index of row.
+     * @param colStart integer input for defining starting index of column.
+     * @param colEnd   integer input for defining ending index of column.
      * @return result Matrix.
      */
-    public Matrix partial(int rowstart, int rowend, int colstart, int colend) {
+    public Matrix partial(int rowStart, int rowEnd, int colStart, int colEnd) {
         int i, j;
-        Matrix result = new Matrix(rowend - rowstart + 1, colend - colstart + 1);
-        for (i = rowstart; i <= rowend; i++)
-            for (j = colstart; j <= colend; j++)
-                result.values[i - rowstart][j - colstart] = values[i][j];
+        Matrix result = new Matrix(rowEnd - rowStart + 1, colEnd - colStart + 1);
+        for (i = rowStart; i <= rowEnd; i++)
+            for (j = colStart; j <= colEnd; j++)
+                result.values[i - rowStart][j - colStart] = values[i][j];
         return result;
     }
 
