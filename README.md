@@ -1,7 +1,8 @@
 # Math
 For Developers
 ============
-
+You can also see either [Python](https://github.com/olcaytaner/Math-Py) 
+or [C++](https://github.com/olcaytaner/Math-CPP) repository.
 ## Requirements
 
 * [Java Development Kit 8 or higher](#java), Open JDK or Oracle JDK
