@@ -85,6 +85,8 @@ Math
 
 ### Maven Usage
 
-    <groupId>NlpToolkit</groupId>
-    <artifactId>Math</artifactId>
-    <version>1.0.1</version>
+	<dependency>
+  	<groupId>NlpToolkit</groupId>
+  	<artifactId>Math</artifactId>
+  	<version>1.0.1</version>
+	</dependency>
