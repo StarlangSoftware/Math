@@ -102,11 +102,11 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
     }
 
     /**
-     * The containsItem method takes an item as an input and returns <tt>true</tt> if this map contains a mapping for the
+     * The containsItem method takes an item as an input and returns true if this map contains a mapping for the
      * given item.
      *
      * @param item to check.
-     * @return <tt>true</tt> if this map contains a mapping for the given item.
+     * @return true if this map contains a mapping for the given item.
      */
     public boolean containsItem(String item) {
         return containsKey(item);
