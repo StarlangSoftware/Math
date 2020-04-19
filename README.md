@@ -76,12 +76,11 @@ Use below line to generate jar file:
 
 ## Maven Usage
 
-	<dependency>
-  	<groupId>NlpToolkit</groupId>
-  	<artifactId>Math</artifactId>
-  	<version>1.0.1</version>
-	</dependency>
-
+        <dependency>
+            <groupId>io.github.starlangsoftware</groupId>
+            <artifactId>Math</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 
 ------------------------------------------------
 
