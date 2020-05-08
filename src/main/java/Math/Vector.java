@@ -29,7 +29,7 @@ public class Vector implements Serializable {
      */
     public Vector(int size, double x) {
         this.size = size;
-        values = new ArrayList<Double>();
+        values = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             values.add(x);
         }
@@ -46,7 +46,7 @@ public class Vector implements Serializable {
      */
     public Vector(int size, int index, double x) {
         this.size = size;
-        values = new ArrayList<Double>();
+        values = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             values.add(0.0);
         }
@@ -61,7 +61,7 @@ public class Vector implements Serializable {
      * @param values double {@link java.lang.reflect.Array} input.
      */
     public Vector(double[] values) {
-        this.values = new ArrayList<Double>();
+        this.values = new ArrayList<>();
         for (double value : values) {
             this.values.add(value);
         }
@@ -121,6 +121,19 @@ public class Vector implements Serializable {
         for (int i = 0; i < values.size(); i++) {
             values.set(i, 0.0);
         }
+    }
+
+    /**
+     * The sumOfElements method sums up all elements in the vector.
+     *
+     * @return Sum of all elements in the vector.
+     */
+    public double sumOfElements() {
+        double total = 0;
+        for (int i = 0; i < size; i++) {
+            total += values.get(i);
+        }
+        return total;
     }
 
     /**

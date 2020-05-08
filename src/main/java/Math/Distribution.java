@@ -52,7 +52,7 @@ public class Distribution {
      */
     public static double gammaLn(double x) {
         double y, tmp, ser;
-        double cof[] = {76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5};
+        double[] cof = {76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5};
         int j;
         y = x;
         tmp = x + 5.5;
@@ -65,11 +65,10 @@ public class Distribution {
     }
 
     /**
-     * The zNormal method performs the Z-Normalization. It ensures, that all elements of the input vector are transformed
-     * into the output vector whose mean is approximately 0 while the standard deviation is in a range close to 1.
+     * The zNormal method returns the probability of the given input for z normal distribution.
      *
      * @param z double input.
-     * @return normalized value of given input.
+     * @return the probability of the given input.
      */
     public static double zNormal(double z) {
         double y, x, w;
@@ -123,13 +122,11 @@ public class Distribution {
     }
 
     /**
-     * The chiSquare method is used to determine whether there is a significant difference between the expected
-     * frequencies and the observed frequencies in one or more categories. It takes a double input x and an integer freedom
-     * for degrees of freedom as inputs. It returns the Chi Squared result.
+     * The chiSquare method returns the probability of the given input for chi square distribution.
      *
      * @param x       double input.
      * @param freedom integer input for degrees of freedom.
-     * @return the Chi Squared result.
+     * @return the probability of the given input.
      */
     public static double chiSquare(double x, int freedom) {
         double a, y = 0, s;
@@ -218,13 +215,12 @@ public class Distribution {
     }
 
     /**
-     * The fDistribution method is used to observe whether two samples have the same variance. It takes a double input F
-     * and two integer freedom1 and freedom2 for degrees of freedom as inputs. It returns the F-Distribution result.
+     * The fDistribution method returns the probability of the given input for F distribution.
      *
      * @param F        double input.
      * @param freedom1 integer input for degrees of freedom.
      * @param freedom2 integer input for degrees of freedom.
-     * @return the F-Distribution result.
+     * @return the probability of the given input.
      */
     public static double fDistribution(double F, int freedom1, int freedom2) {
         int i, j;
@@ -323,12 +319,11 @@ public class Distribution {
     }
 
     /**
-     * The tDistribution method is used instead of the normal distribution when there is small samples. It takes a double input T
-     * and an integer freedom for degree of freedom as inputs. It returns the T-Distribution result by using F-Distribution method.
+     * The tDistribution method returns the probability of the given input for t distribution.
      *
      * @param T       double input.
      * @param freedom integer input for degrees of freedom.
-     * @return the T-Distribution result.
+     * @return the probability of the given input.
      */
     public static double tDistribution(double T, int freedom) {
         if (T >= 0) {
