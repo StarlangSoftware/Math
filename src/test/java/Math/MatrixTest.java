@@ -67,7 +67,6 @@ public class MatrixTest {
         large.multiplyWithConstant(1.001);
         assertEquals(1001000, large.sumOfElements(), 0.001);
         large.divideByConstant(1.001);
-        double originalSum = random.sumOfElements();
         random.multiplyWithConstant(3.6);
         assertEquals(originalSum * 3.6, random.sumOfElements(), 0.0001);
         random.divideByConstant(3.6);
