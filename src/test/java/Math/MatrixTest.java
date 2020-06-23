@@ -42,7 +42,7 @@ public class MatrixTest {
         }
         V = new Vector(1000, 1.0);
         vr = new Vector(100, 1.0);
-        random = new Matrix(100, 100, 1, 10);
+        random = new Matrix(100, 100, 1, 10, new Random());
         originalSum = random.sumOfElements();
         identity = new Matrix(100);
     }

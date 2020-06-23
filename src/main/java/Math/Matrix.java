@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Matrix implements Serializable {
@@ -60,14 +61,15 @@ public class Matrix implements Serializable {
      * @param col is used to create matrix.
      * @param min minimum value.
      * @param max maximum value.
+     * @param random random function to set the random values in the matrix.
      */
-    public Matrix(int row, int col, double min, double max) {
+    public Matrix(int row, int col, double min, double max, Random random) {
         values = new double[row][col];
         this.row = row;
         this.col = col;
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                values[i][j] = min + (max - min) * Math.random();
+                values[i][j] = min + (max - min) * random.nextDouble();
             }
         }
     }
