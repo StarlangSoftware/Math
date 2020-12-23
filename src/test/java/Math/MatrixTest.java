@@ -49,12 +49,10 @@ public class MatrixTest {
 
     @Test
     public void testColumnWiseNormalize() {
-        Matrix mClone = small.clone();
-        mClone.columnWiseNormalize();
-        assertEquals(3, mClone.sumOfElements(), 0.0);
-        Matrix MClone = large.clone();
-        MClone.columnWiseNormalize();
-        assertEquals(1000, MClone.sumOfElements(), 0.001);
+        small.columnWiseNormalize();
+        assertEquals(3, small.sumOfElements(), 0.0);
+        large.columnWiseNormalize();
+        assertEquals(1000, large.sumOfElements(), 0.001);
         identity.columnWiseNormalize();
         assertEquals(100, identity.sumOfElements(), 0.0);
     }
@@ -63,49 +61,38 @@ public class MatrixTest {
     public void testMultiplyWithConstant() {
         small.multiplyWithConstant(4);
         assertEquals(36, small.sumOfElements(), 0.0);
-        small.divideByConstant(4);
         large.multiplyWithConstant(1.001);
         assertEquals(1001000, large.sumOfElements(), 0.001);
-        large.divideByConstant(1.001);
         random.multiplyWithConstant(3.6);
         assertEquals(originalSum * 3.6, random.sumOfElements(), 0.0001);
-        random.divideByConstant(3.6);
     }
 
     @Test
     public void testDivideByConstant() {
         small.divideByConstant(4);
         assertEquals(2.25, small.sumOfElements(), 0.0);
-        small.multiplyWithConstant(4);
         large.divideByConstant(10);
         assertEquals(100000, large.sumOfElements(), 0.001);
-        large.multiplyWithConstant(10);
         random.divideByConstant(3.6);
         assertEquals(originalSum / 3.6, random.sumOfElements(), 0.0001);
-        random.multiplyWithConstant(3.6);
     }
 
     @Test
     public void testAdd() throws Exception{
         random.add(identity);
         assertEquals(originalSum + 100, random.sumOfElements(), 0.0001);
-        random.subtract(identity);
     }
 
     @Test
     public void testAddVector() throws Exception{
         large.add(4, V);
         assertEquals(1001000, large.sumOfElements(), 0.0);
-        V.multiply(-1.0);
-        large.add(4, V);
-        V.multiply(-1.0);
     }
 
     @Test
     public void testSubtract() throws Exception{
         random.subtract(identity);
         assertEquals(originalSum - 100, random.sumOfElements(), 0.0001);
-        random.add(identity);
     }
 
     @Test
