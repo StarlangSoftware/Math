@@ -38,7 +38,6 @@ public class VectorTest {
         smallVector1.add(7);
         assertEquals(7, smallVector1.getValue(5), 0.0);
         assertEquals(6, smallVector1.size());
-        smallVector1.remove(5);
     }
 
     @org.junit.Test
@@ -46,7 +45,6 @@ public class VectorTest {
         smallVector1.insert(3, 6);
         assertEquals(6, smallVector1.getValue(3), 0.0);
         assertEquals(6, smallVector1.size());
-        smallVector1.remove(3);
     }
 
     @org.junit.Test
@@ -54,7 +52,6 @@ public class VectorTest {
         smallVector1.remove(2);
         assertEquals(5, smallVector1.getValue(2), 0.0);
         assertEquals(4, smallVector1.size());
-        smallVector1.insert(2, 4);
     }
 
     @org.junit.Test
@@ -65,8 +62,6 @@ public class VectorTest {
 
     @org.junit.Test
     public void testSumOfElementsLarge() {
-        assertEquals(20, smallVector1.sumOfElements(), 0.0);
-        assertEquals(30, smallVector2.sumOfElements(), 0.0);
         assertEquals(500500, largeVector1.sumOfElements(), 0.0);
         assertEquals(500500, largeVector2.sumOfElements(), 0.0);
     }
@@ -109,28 +104,24 @@ public class VectorTest {
     public void testVectorAddSmall() throws Exception{
         smallVector1.add(smallVector2);
         assertEquals(50, smallVector1.sumOfElements(), 0.0);
-        smallVector1.subtract(smallVector2);
     }
 
     @org.junit.Test
     public void testVectorAddLarge() throws Exception{
         largeVector1.add(largeVector2);
         assertEquals(1001000, largeVector1.sumOfElements(), 0.0);
-        largeVector1.subtract(largeVector2);
     }
 
     @org.junit.Test
     public void testSubtractSmall() throws Exception{
         smallVector1.subtract(smallVector2);
         assertEquals(-10, smallVector1.sumOfElements(), 0.0);
-        smallVector1.add(smallVector2);
     }
 
     @org.junit.Test
     public void testSubtractLarge() throws Exception{
         largeVector1.subtract(largeVector2);
         assertEquals(0, largeVector1.sumOfElements(), 0.0);
-        largeVector1.add(largeVector2);
     }
 
     @org.junit.Test
@@ -185,14 +176,12 @@ public class VectorTest {
     public void testDivide() {
         smallVector1.divide(10.0);
         assertEquals(2, smallVector1.sumOfElements(), 0.0);
-        smallVector1.multiply(10.0);
     }
 
     @org.junit.Test
     public void testMultiply() {
         smallVector1.multiply(10.0);
         assertEquals(200, smallVector1.sumOfElements(), 0.0);
-        smallVector1.divide(10.0);
     }
 
     @org.junit.Test
@@ -205,14 +194,12 @@ public class VectorTest {
     public void testL1NormalizeSmall() {
         smallVector1.l1Normalize();
         assertEquals(1.0, smallVector1.sumOfElements(), 0.0);
-        smallVector1.multiply(20);
     }
 
     @org.junit.Test
     public void testL1NormalizeLarge() {
         largeVector1.l1Normalize();
         assertEquals(1.0, largeVector1.sumOfElements(), 0.0);
-        largeVector1.multiply(500500);
     }
 
     @org.junit.Test

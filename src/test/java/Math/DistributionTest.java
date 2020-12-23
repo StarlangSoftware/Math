@@ -108,7 +108,6 @@ public class DistributionTest {
         assertEquals(0.01, Distribution.tDistribution(2.528, 20), 0.0001);
         assertEquals(0.005, Distribution.tDistribution(2.845, 20), 0.0001);
         assertEquals(0.001, Distribution.tDistribution(3.552, 20), 0.0001);
-
     }
 
     @Test
