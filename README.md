@@ -82,7 +82,7 @@ Use below line to generate jar file:
             <version>1.0.2</version>
         </dependency>
 
-For Developers
+Detailed Description
 ============
 
 + [Vector](#vector)
