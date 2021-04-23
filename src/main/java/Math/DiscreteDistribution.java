@@ -2,6 +2,7 @@ package Math;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.*;
 
@@ -196,6 +197,14 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
         } else {
             return 0.0;
         }
+    }
+
+    public HashMap<String, Double> getProbabilityDistribution(){
+        HashMap<String, Double> result = new HashMap<>();
+        for (String item : keySet()){
+            result.put(item, getProbability(item));
+        }
+        return result;
     }
 
     /**
