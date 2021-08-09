@@ -166,6 +166,42 @@ public class Vector implements Serializable {
     }
 
     /**
+     * The tanh method loops through the values {@link ArrayList} and sets each ith item with tanh function, i.e, i
+     * ranges from 0 to size.
+     */
+    public void tanh() {
+        for (int i = 0; i < size; i++) {
+            values.set(i, Math.tanh(values.get(i)));
+        }
+    }
+
+    /**
+     * The relu method loops through the values {@link ArrayList} and sets each ith item with relu function, i.e, i
+     * ranges from 0 to size.
+     */
+    public void relu() {
+        for (int i = 0; i < size; i++) {
+            if (values.get(i) < 0){
+                values.set(i, 0.0);
+            }
+        }
+    }
+
+    /**
+     * The relu method loops through the values {@link ArrayList} and sets each ith item with relu function, i.e, i
+     * ranges from 0 to size.
+     */
+    public void reluDerivative() {
+        for (int i = 0; i < size; i++) {
+            if (values.get(i) > 0){
+                values.set(i, 1.0);
+            } else {
+                values.set(i, 0.0);
+            }
+        }
+    }
+
+    /**
      * The skipVector method takes a mod and a value as inputs. It creates a new result Vector, and assigns given input value to i.
      * While i is less than the size, it adds the ith item of values {@link ArrayList} to the result and increments i by given mod input.
      *
