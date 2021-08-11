@@ -166,8 +166,7 @@ public class Vector implements Serializable {
     }
 
     /**
-     * The tanh method loops through the values {@link ArrayList} and sets each ith item with tanh function, i.e, i
-     * ranges from 0 to size.
+     * The tanh method loops through the values {@link ArrayList} and sets each ith item with tanh function.
      */
     public void tanh() {
         for (int i = 0; i < size; i++) {
@@ -176,8 +175,7 @@ public class Vector implements Serializable {
     }
 
     /**
-     * The relu method loops through the values {@link ArrayList} and sets each ith item with relu function, i.e, i
-     * ranges from 0 to size.
+     * The relu method loops through the values {@link ArrayList} and sets each ith item with relu function.
      */
     public void relu() {
         for (int i = 0; i < size; i++) {
@@ -188,8 +186,8 @@ public class Vector implements Serializable {
     }
 
     /**
-     * The relu method loops through the values {@link ArrayList} and sets each ith item with relu function, i.e, i
-     * ranges from 0 to size.
+     * The relu method loops through the values {@link ArrayList} and sets each ith item with the derivative of
+     * relu function.
      */
     public void reluDerivative() {
         for (int i = 0; i < size; i++) {
