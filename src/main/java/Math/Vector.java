@@ -186,7 +186,7 @@ public class Vector implements Serializable {
     }
 
     /**
-     * The relu method loops through the values {@link ArrayList} and sets each ith item with the derivative of
+     * The reluDerivative method loops through the values {@link ArrayList} and sets each ith item with the derivative of
      * relu function.
      */
     public void reluDerivative() {
