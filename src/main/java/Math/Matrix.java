@@ -460,6 +460,30 @@ public class Matrix implements Serializable {
     }
 
     /**
+     * The elementProduct method takes a {@link Vector} as an input and performs element wise multiplication. Puts result
+     * to the newly created Matrix.
+     *
+     * @param v Vector type input.
+     * @return result {@link Matrix}.
+     */
+    public Matrix elementProduct(Vector v) {
+        Matrix result;
+        result = new Matrix(row, col);
+        if (row == 1 && col == v.size()){
+            for (int i = 0; i < col; i++) {
+                result.values[0][i] = values[0][i] * v.getValue(i);
+            }
+        } else {
+            if (col == 1 && row == v.size()){
+                for (int i = 0; i < row; i++) {
+                    result.values[i][0] = values[i][0] * v.getValue(i);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * The sumOfElements method accumulates all the items in values {@link java.lang.reflect.Array} and
      * returns this summation.
      *
