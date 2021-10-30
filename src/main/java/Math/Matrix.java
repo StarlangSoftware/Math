@@ -407,7 +407,7 @@ public class Matrix implements Serializable {
 
     /**
      * The multiply method takes a {@link Matrix} as an input. First it creates a result {@link Matrix} and puts the
-     * accumulatated multiplication of values {@link java.lang.reflect.Array} and given {@link Matrix} into result
+     * accumulated multiplication of values {@link java.lang.reflect.Array} and given {@link Matrix} into result
      * {@link Matrix}. If the size of Matrix's row size and values {@link java.lang.reflect.Array}'s column size do not match,
      * it throws {@link MatrixRowColumnMismatch} exception.
      *
