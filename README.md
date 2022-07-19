@@ -3,6 +3,11 @@ For Developers
 
 You can also see [Python](https://github.com/starlangsoftware/Math-Py), [Cython](https://github.com/starlangsoftware/Math-Cy), [C++](https://github.com/starlangsoftware/Math-CPP), [Swift](https://github.com/starlangsoftware/Math-Swift), [Js](https://github.com/starlangsoftware/Math-Js), or [C#](https://github.com/starlangsoftware/Math-CPP) repository.
 
+Class Diagram
+============
+
+<img src="classDiagram.png">
+
 ## Requirements
 
 * [Java Development Kit 8 or higher](#java), Open JDK or Oracle JDK
