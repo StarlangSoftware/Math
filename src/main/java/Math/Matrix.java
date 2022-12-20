@@ -275,6 +275,20 @@ public class Matrix implements Serializable {
         }
     }
 
+    public Matrix sum(Matrix m) throws MatrixDimensionMismatch{
+        int i, j;
+        if (row != m.row || col != m.col) {
+            throw new MatrixDimensionMismatch();
+        }
+        Matrix result = new Matrix(row, col);
+        for (i = 0; i < row; i++) {
+            for (j = 0; j < col; j++) {
+                result.values[i][j] = values[i][j] + m.values[i][j];
+            }
+        }
+        return result;
+    }
+
     /**
      * The add method which takes a row number and a Vector as inputs. It sums up the corresponding values at the given row of
      * values {@link java.lang.reflect.Array} and given {@link Vector}. If the sizes of both Matrix and values
@@ -311,6 +325,20 @@ public class Matrix implements Serializable {
                 values[i][j] -= m.values[i][j];
             }
         }
+    }
+
+    public Matrix difference(Matrix m) throws MatrixDimensionMismatch {
+        int i, j;
+        if (row != m.row || col != m.col) {
+            throw new MatrixDimensionMismatch();
+        }
+        Matrix result = new Matrix(row, col);
+        for (i = 0; i < row; i++) {
+            for (j = 0; j < col; j++) {
+                result.values[i][j] = values[i][j] - m.values[i][j];
+            }
+        }
+        return result;
     }
 
     /**
