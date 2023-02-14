@@ -45,6 +45,7 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
                 remove(item);
             }
         }
+        sum--;
     }
 
     /**
