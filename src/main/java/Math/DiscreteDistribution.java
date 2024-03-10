@@ -100,7 +100,7 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
      * @return index of given item.
      */
     public int getIndex(String item) {
-        return (new ArrayList<String>(keySet())).indexOf(item);
+        return (new ArrayList<>(keySet())).indexOf(item);
     }
 
     /**
@@ -121,7 +121,7 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
      * @return the item at given index.
      */
     public String getItem(int index) {
-        return (new ArrayList<String>(keySet())).get(index);
+        return (new ArrayList<>(keySet())).get(index);
     }
 
     /**
@@ -131,7 +131,7 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
      * @return the value at given index.
      */
     public Integer getValue(int index) {
-        return (new ArrayList<Integer>(values())).get(index);
+        return (new ArrayList<>(values())).get(index);
     }
 
     /**

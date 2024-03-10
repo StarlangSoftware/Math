@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Vector implements Serializable {
 
     private int size;
-    private ArrayList<Double> values;
+    private final ArrayList<Double> values;
 
     /**
      * A constructor of {@link Vector} class which takes an {@link ArrayList} values as an input. Then, initializes

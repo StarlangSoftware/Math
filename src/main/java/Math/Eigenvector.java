@@ -3,7 +3,7 @@ package Math;
 import java.util.ArrayList;
 
 public class Eigenvector extends Vector implements Comparable {
-    private double eigenValue;
+    private final double eigenValue;
 
     /**
      * A constructor of {@link Eigenvector} which takes a double eigenValue and an {@link ArrayList} values as inputs.

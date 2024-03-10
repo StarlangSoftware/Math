@@ -110,7 +110,7 @@ public class Matrix implements Serializable {
     public void printToFile(String fileName) {
         PrintWriter output;
         try {
-            output = new PrintWriter(new File(fileName));
+            output = new PrintWriter(fileName);
             for (int i = 0; i < row; i++) {
                 output.print(String.format("%.5f", values[i][0]));
                 for (int j = 1; j < col; j++) {
@@ -119,8 +119,7 @@ public class Matrix implements Serializable {
                 output.println();
             }
             output.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException ignored) {
         }
     }
 
@@ -649,7 +648,7 @@ public class Matrix implements Serializable {
         double dum, pivinv;
         int i, icol, irow, j, k, l, ll;
         Matrix b;
-        int indxc[], indxr[], ipiv[];
+        int[] indxc, indxr, ipiv;
         b = new Matrix(row);
         indxc = new int[row];
         indxr = new int[row];
