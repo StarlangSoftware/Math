@@ -89,7 +89,7 @@ Use below line to generate jar file:
         <dependency>
             <groupId>io.github.starlangsoftware</groupId>
             <artifactId>Math</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.9</version>
         </dependency>
 
 Detailed Description
