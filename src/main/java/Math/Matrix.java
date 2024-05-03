@@ -259,7 +259,7 @@ public class Matrix implements Serializable {
      * corresponding items of given Matrix. If the sizes of both Matrix and values {@link java.lang.reflect.Array} do not match,
      * it throws {@link MatrixDimensionMismatch} exception.
      *
-     * @param m Matrix type input.
+     * @param m Matrix to be added.
      * @throws MatrixDimensionMismatch exception if sizes of both input Matrix and values Array do not match.
      */
     public void add(Matrix m) throws MatrixDimensionMismatch {
@@ -274,6 +274,14 @@ public class Matrix implements Serializable {
         }
     }
 
+    /**
+     * The add method takes a {@link Matrix} as an input and sums values {@link java.lang.reflect.Array} with the
+     * corresponding items of given Matrix and returns as a new Matrix. If the sizes of both Matrix and values
+     * {@link java.lang.reflect.Array} do not match, it throws {@link MatrixDimensionMismatch} exception.
+     * @param m Matrix to be added.
+     * @return Sum of current matrix and m.
+     * @throws MatrixDimensionMismatch exception if sizes of both input Matrix and values Array do not match.
+     */
     public Matrix sum(Matrix m) throws MatrixDimensionMismatch{
         int i, j;
         if (row != m.row || col != m.col) {
@@ -326,6 +334,15 @@ public class Matrix implements Serializable {
         }
     }
 
+    /**
+     * The difference method takes a {@link Matrix} as an input and subtracts from values {@link java.lang.reflect.Array} the
+     * corresponding items of given Matrix. If the sizes of both Matrix and values {@link java.lang.reflect.Array} do not match,
+     * it throws {@link MatrixDimensionMismatch} exception.
+     *
+     * @param m Matrix type input.
+     * @return Difference between current matrix and m.
+     * @throws MatrixDimensionMismatch exception if sizes of both input Matrix and values Array do not match.
+     */
     public Matrix difference(Matrix m) throws MatrixDimensionMismatch {
         int i, j;
         if (row != m.row || col != m.col) {

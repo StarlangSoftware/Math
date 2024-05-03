@@ -200,6 +200,10 @@ public class DiscreteDistribution extends LinkedHashMap<String, Integer> impleme
         }
     }
 
+    /**
+     * Returns the distribution as a probability distribution
+     * @return Probability distribution
+     */
     public HashMap<String, Double> getProbabilityDistribution(){
         HashMap<String, Double> result = new HashMap<>();
         for (String item : keySet()){
