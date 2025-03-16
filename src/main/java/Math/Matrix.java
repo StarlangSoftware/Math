@@ -867,13 +867,13 @@ public class Matrix implements Serializable {
                 z[ip] = 0.0;
             }
         }
-        ArrayList<Eigenvector> result = new ArrayList<>();
+        ArrayList<Eigenvector> result = new ArrayList<Eigenvector>();
         for (i = 0; i < row; i++) {
             if (d[i] > 0) {
                 result.add(new Eigenvector(d[i], v.getColumn(i)));
             }
         }
-        Collections.sort(result);
+        Collections.sort(result, null);
         return result;
     }
 }

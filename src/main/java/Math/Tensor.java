@@ -33,6 +33,65 @@ public class Tensor {
     }
 
     /**
+     * Creates a tensor filled with zeros.
+     *
+     * @param shape The shape of the tensor.
+     * @return New tensor filled with zeros.
+     */
+    public static Tensor zeros(int[] shape) {
+        int totalElements = computeNumElementsStatic(shape);
+        List<Double> data = new ArrayList<>(totalElements);
+        for (int i = 0; i < totalElements; i++) {
+            data.add(0.0);
+        }
+        return new Tensor(data, shape);
+    }
+
+    /**
+     * Creates a tensor filled with ones.
+     *
+     * @param shape The shape of the tensor.
+     * @return New tensor filled with ones.
+     */
+    public static Tensor ones(int[] shape) {
+        int totalElements = computeNumElementsStatic(shape);
+        List<Double> data = new ArrayList<>(totalElements);
+        for (int i = 0; i < totalElements; i++) {
+            data.add(1.0);
+        }
+        return new Tensor(data, shape);
+    }
+
+    /**
+     * Creates a tensor filled with random values.
+     *
+     * @param shape The shape of the tensor.
+     * @return New tensor filled with random values.
+     */
+    public static Tensor random(int[] shape) {
+        int totalElements = computeNumElementsStatic(shape);
+        List<Double> data = new ArrayList<>(totalElements);
+        for (int i = 0; i < totalElements; i++) {
+            data.add(Math.random());
+        }
+        return new Tensor(data, shape);
+    }
+
+    /**
+     * Computes the total number of elements in the tensor based on its shape.
+     *
+     * @param shape Array representing the tensor shape.
+     * @return Total number of elements.
+     */
+    private static int computeNumElementsStatic(int[] shape) {
+        int product = 1;
+        for (int dim : shape) {
+            product *= dim;
+        }
+        return product;
+    }
+
+    /**
      * Infers the shape of the tensor from nested lists.
      *
      * @param data Nested lists representing the tensor data.

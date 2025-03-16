@@ -169,7 +169,7 @@ public class DiscreteDistributionTest {
 
     @Test
     public void testGetMaxItem2() {
-        ArrayList include = new ArrayList();
+        ArrayList<String> include = new ArrayList<>();
         include.add("item2");
         include.add("item3");
         assertEquals("item2", smallDistribution.getMaxItem(include));
