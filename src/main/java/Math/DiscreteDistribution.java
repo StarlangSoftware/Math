@@ -1,12 +1,11 @@
 package Math;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.*;
 
-public class DiscreteDistribution extends LinkedHashMap<String, Integer> implements Serializable {
+public class DiscreteDistribution extends LinkedHashMap<String, Integer> {
 
     private double sum = 0;
 

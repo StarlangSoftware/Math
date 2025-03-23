@@ -2,7 +2,7 @@ package Math;
 
 import java.util.ArrayList;
 
-public class Eigenvector extends Vector implements Comparable {
+public class Eigenvector extends Vector implements Comparable<Object> {
     private final double eigenValue;
 
     /**
