@@ -1,154 +1,284 @@
 package Math;
 
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.rules.ExpectedException;
+
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class TensorTest {
 
-    @Test
-    public void testTensorInitialization() {
-        List<List<Double>> data = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        int[] shape = {2, 3};
-        Tensor tensor = new Tensor(data, shape);
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-        assertArrayEquals(shape, tensor.getShape());
-        assertEquals(1.0, tensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(6.0, tensor.get(new int[]{1, 2}), 0.0003f);
+    @Test
+    public void testConstructorWithInferredShape() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        assertArrayEquals(new int[]{2, 2}, tensor.getShape());
+        assertEquals(Arrays.asList(1.0, 2.0, 3.0, 4.0), tensor.getData());
     }
 
     @Test
-    public void testTensorInitializationWithInferredShape() {
-        List<List<Double>> data = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        Tensor tensor = new Tensor(data, null);
-
-        assertArrayEquals(new int[]{2, 3}, tensor.getShape());
-        assertEquals(1.0, tensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(6.0, tensor.get(new int[]{1, 2}), 0.0003f);
+    public void testConstructorWithExplicitShape() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor = new Tensor(data, new int[]{2, 2});
+        assertArrayEquals(new int[]{2, 2}, tensor.getShape());
+        assertEquals(Arrays.asList(1.0, 2.0, 3.0, 4.0), tensor.getData());
     }
 
     @Test
-    public void testTensorReshape() {
-        List<List<Double>> data = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        Tensor tensor = new Tensor(data, new int[]{2, 3});
-        Tensor reshapedTensor = tensor.reshape(new int[]{3, 2});
-
-        assertArrayEquals(new int[]{3, 2}, reshapedTensor.getShape());
-        assertEquals(1.0, reshapedTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(6.0, reshapedTensor.get(new int[]{2, 1}), 0.0003f);
+    public void testConstructorShapeMismatch() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Shape does not match the number of elements in data.");
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0);
+        new Tensor(data, new int[]{2, 2});
     }
 
     @Test
-    public void testTensorTranspose() {
-        List<List<Double>> data = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        Tensor tensor = new Tensor(data, new int[]{2, 3});
-        Tensor transposedTensor = tensor.transpose(null);
-
-        assertArrayEquals(new int[]{3, 2}, transposedTensor.getShape());
-        assertEquals(1.0, transposedTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(6.0, transposedTensor.get(new int[]{2, 1}), 0.0003f);
-    }
-
-    @Test
-    public void testTensorBroadcast() {
+    public void testGetShape() {
         List<Double> data = Arrays.asList(1.0, 2.0, 3.0);
         Tensor tensor = new Tensor(data, new int[]{3});
-        Tensor broadcastedTensor = tensor.broadcastTo(new int[]{2, 3});
-
-        assertArrayEquals(new int[]{2, 3}, broadcastedTensor.getShape());
-        assertEquals(1.0, broadcastedTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(3.0, broadcastedTensor.get(new int[]{1, 2}), 0.0003f);
+        assertArrayEquals(new int[]{3}, tensor.getShape());
     }
 
     @Test
-    public void testTensorAddition() {
-        List<List<Double>> data1 = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        List<List<Double>> data2 = Arrays.asList(
-                Arrays.asList(7.0, 8.0, 9.0),
-                Arrays.asList(10.0, 11.0, 12.0)
-        );
-        Tensor tensor1 = new Tensor(data1, new int[]{2, 3});
-        Tensor tensor2 = new Tensor(data2, new int[]{2, 3});
-        Tensor resultTensor = tensor1.add(tensor2);
-
-        assertArrayEquals(new int[]{2, 3}, resultTensor.getShape());
-        assertEquals(8.0, resultTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(18.0, resultTensor.get(new int[]{1, 2}), 0.0003f);
+    public void testGetData() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor = new Tensor(data, new int[]{2, 2});
+        assertEquals(data, tensor.getData());
     }
 
     @Test
-    public void testTensorSubtraction() {
-        List<List<Double>> data1 = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        List<List<Double>> data2 = Arrays.asList(
-                Arrays.asList(7.0, 8.0, 9.0),
-                Arrays.asList(10.0, 11.0, 12.0)
-        );
-        Tensor tensor1 = new Tensor(data1, new int[]{2, 3});
-        Tensor tensor2 = new Tensor(data2, new int[]{2, 3});
-        Tensor resultTensor = tensor1.subtract(tensor2);
-
-        assertArrayEquals(new int[]{2, 3}, resultTensor.getShape());
-        assertEquals(-6.0, resultTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(-6.0, resultTensor.get(new int[]{1, 2}), 0.0003f);
+    public void testGetValidIndices() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor = new Tensor(data, new int[]{2, 2});
+        assertEquals(1.0, tensor.get(new int[]{0, 0}), 1e-9);
+        assertEquals(4.0, tensor.get(new int[]{1, 1}), 1e-9);
     }
 
     @Test
-    public void testTensorMultiplication() {
-        List<List<Double>> data1 = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        List<List<Double>> data2 = Arrays.asList(
-                Arrays.asList(7.0, 8.0, 9.0),
-                Arrays.asList(10.0, 11.0, 12.0)
-        );
-        Tensor tensor1 = new Tensor(data1, new int[]{2, 3});
-        Tensor tensor2 = new Tensor(data2, new int[]{2, 3});
-        Tensor resultTensor = tensor1.multiply(tensor2);
-
-        assertArrayEquals(new int[]{2, 3}, resultTensor.getShape());
-        assertEquals(7.0, resultTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(72.0, resultTensor.get(new int[]{1, 2}), 0.0003f);
+    public void testGetOutOfBoundsIndices() {
+        List<Double> data = Arrays.asList(1.0, 2.0);
+        Tensor tensor = new Tensor(data, new int[]{2});
+        thrown.expect(IndexOutOfBoundsException.class);
+        tensor.get(new int[]{2});
     }
 
     @Test
-    public void testTensorDotProduct() {
-        List<List<Double>> data1 = Arrays.asList(
-                Arrays.asList(1.0, 2.0, 3.0),
-                Arrays.asList(4.0, 5.0, 6.0)
-        );
-        List<List<Double>> data2 = Arrays.asList(
-                Arrays.asList(7.0, 8.0),
-                Arrays.asList(9.0, 10.0),
-                Arrays.asList(11.0, 12.0)
-        );
-        Tensor tensor1 = new Tensor(data1, new int[]{2, 3});
-        Tensor tensor2 = new Tensor(data2, new int[]{3, 2});
-        Tensor resultTensor = tensor1.dot(tensor2);
+    public void testSetValidIndices() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor = new Tensor(data, new int[]{2, 2});
+        tensor.set(new int[]{0, 0}, 5.0);
+        assertEquals(5.0, tensor.get(new int[]{0, 0}), 1e-9);
+    }
 
-        assertArrayEquals(new int[]{2, 2}, resultTensor.getShape());
-        assertEquals(58.0, resultTensor.get(new int[]{0, 0}), 0.0003f);
-        assertEquals(64.0, resultTensor.get(new int[]{0, 1}), 0.0003f);
-        assertEquals(139.0, resultTensor.get(new int[]{1, 0}), 0.0003f);
-        assertEquals(154.0, resultTensor.get(new int[]{1, 1}), 0.0003f);
+    @Test
+    public void testSetOutOfBoundsIndices() {
+        List<Double> data = Arrays.asList(1.0, 2.0);
+        Tensor tensor = new Tensor(data, new int[]{2});
+        thrown.expect(IndexOutOfBoundsException.class);
+        tensor.set(new int[]{2}, 5.0);
+    }
+
+    @Test
+    public void testReshapeValid() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor = new Tensor(data, new int[]{2, 2});
+        Tensor reshaped = tensor.reshape(new int[]{4});
+        assertArrayEquals(new int[]{4}, reshaped.getShape());
+        assertEquals(data, reshaped.getData());
+    }
+
+    @Test
+    public void testReshapeInvalid() {
+        List<Double> data = Arrays.asList(1.0, 2.0, 3.0);
+        Tensor tensor = new Tensor(data, new int[]{3});
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Total number of elements must remain the same.");
+        tensor.reshape(new int[]{2, 2});
+    }
+
+    @Test
+    public void testTransposeNoAxes() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        Tensor transposed = tensor.transpose(null);
+        assertArrayEquals(new int[]{2, 2}, transposed.getShape());
+        assertEquals(Arrays.asList(1.0, 3.0, 2.0, 4.0), transposed.getData());
+    }
+
+    @Test
+    public void testTransposeWithAxes() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0, 3.0), Arrays.asList(4.0, 5.0, 6.0));
+        Tensor tensor = new Tensor(data);
+        Tensor transposed = tensor.transpose(new int[]{1, 0});
+        assertArrayEquals(new int[]{3, 2}, transposed.getShape());
+        assertEquals(Arrays.asList(1.0, 4.0, 2.0, 5.0, 3.0, 6.0), transposed.getData());
+    }
+
+    @Test
+    public void testTransposeInvalidAxesLength() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Invalid transpose axes.");
+        tensor.transpose(new int[]{0});
+    }
+
+    @Test
+    public void testTransposeInvalidAxesValue() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Invalid transpose axes.");
+        tensor.transpose(new int[]{0, 2});
+    }
+
+    @Test
+    public void testBroadcastToValid() {
+        List<Double> data = Arrays.asList(1.0, 2.0);
+        Tensor tensor = new Tensor(data, new int[]{1, 2});
+        Tensor broadcasted = tensor.broadcast_to(new int[]{2, 2});
+        assertArrayEquals(new int[]{2, 2}, broadcasted.getShape());
+        assertEquals(Arrays.asList(1.0, 2.0, 1.0, 2.0), broadcasted.getData());
+    }
+
+    @Test
+    public void testBroadcastToInvalid() {
+        List<Double> data = Arrays.asList(1.0, 2.0);
+        Tensor tensor = new Tensor(data, new int[]{2});
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Cannot broadcast shape [2] to [3]");
+        tensor.broadcast_to(new int[]{3});
+    }
+
+    @Test
+    public void testAddSameShape() {
+        List<Double> data1 = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{2, 2});
+        List<Double> data2 = Arrays.asList(5.0, 6.0, 7.0, 8.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
+        Tensor sum = tensor1.add(tensor2);
+        assertArrayEquals(new int[]{2, 2}, sum.getShape());
+        assertEquals(Arrays.asList(6.0, 8.0, 10.0, 12.0), sum.getData());
+    }
+
+    @Test
+    public void testAddWithBroadcasting() {
+        List<Double> data1 = Arrays.asList(1.0, 2.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{1, 2});
+        List<Double> data2 = Arrays.asList(3.0, 4.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{2, 1});
+        Tensor sum = tensor1.add(tensor2);
+        assertArrayEquals(new int[]{2, 2}, sum.getShape());
+        assertEquals(Arrays.asList(4.0, 5.0, 5.0, 6.0), sum.getData());
+    }
+
+    @Test
+    public void testSubtractSameShape() {
+        List<Double> data1 = Arrays.asList(5.0, 6.0, 7.0, 8.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{2, 2});
+        List<Double> data2 = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
+        Tensor diff = tensor1.subtract(tensor2);
+        assertArrayEquals(new int[]{2, 2}, diff.getShape());
+        assertEquals(Arrays.asList(4.0, 4.0, 4.0, 4.0), diff.getData());
+    }
+
+    @Test
+    public void testSubtractWithBroadcasting() {
+        List<Double> data1 = Arrays.asList(5.0, 5.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{2, 1});
+        List<Double> data2 = Arrays.asList(1.0, 2.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{1, 2});
+        Tensor diff = tensor1.subtract(tensor2);
+        assertArrayEquals(new int[]{2, 2}, diff.getShape());
+        assertEquals(Arrays.asList(4.0, 3.0, 4.0, 3.0), diff.getData());
+    }
+
+    @Test
+    public void testMultiplySameShape() {
+        List<Double> data1 = Arrays.asList(1.0, 2.0, 3.0, 4.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{2, 2});
+        List<Double> data2 = Arrays.asList(5.0, 6.0, 7.0, 8.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
+        Tensor product = tensor1.multiply(tensor2);
+        assertArrayEquals(new int[]{2, 2}, product.getShape());
+        assertEquals(Arrays.asList(5.0, 12.0, 21.0, 32.0), product.getData());
+    }
+
+    @Test
+    public void testMultiplyWithBroadcasting() {
+        List<Double> data1 = Arrays.asList(1.0, 2.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{1, 2});
+        List<Double> data2 = Arrays.asList(3.0, 4.0);
+        Tensor tensor2 = new Tensor(data2, new int[]{2, 1});
+        Tensor product = tensor1.multiply(tensor2);
+        assertArrayEquals(new int[]{2, 2}, product.getShape());
+        assertEquals(Arrays.asList(3.0, 6.0, 4.0, 8.0), product.getData());
+    }
+
+    @Test
+    public void testDotProductValid() {
+        List<List<Double>> data1 = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor1 = new Tensor(data1);
+        List<List<Double>> data2 = Arrays.asList(Arrays.asList(5.0, 6.0), Arrays.asList(7.0, 8.0));
+        Tensor tensor2 = new Tensor(data2);
+        Tensor dotProduct = tensor1.dot(tensor2);
+        assertArrayEquals(new int[]{2, 2}, dotProduct.getShape());
+        assertEquals(Arrays.asList(19.0, 22.0, 43.0, 50.0), dotProduct.getData());
+    }
+
+    @Test
+    public void testDotProductInvalidShapes() {
+        List<Double> data1 = Arrays.asList(1.0, 2.0, 3.0);
+        Tensor tensor1 = new Tensor(data1, new int[]{3});
+        List<List<Double>> data2 = Arrays.asList(Arrays.asList(4.0, 5.0), Arrays.asList(6.0, 7.0));
+        Tensor tensor2 = new Tensor(data2);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Shapes [3] and [2, 2] are not aligned for dot product.");
+        tensor1.dot(tensor2);
+    }
+
+    @Test
+    public void testPartialValid() {
+        List<List<Double>> data = Arrays.asList(
+                Arrays.asList(1.0, 2.0, 3.0),
+                Arrays.asList(4.0, 5.0, 6.0),
+                Arrays.asList(7.0, 8.0, 9.0)
+        );
+        Tensor tensor = new Tensor(data);
+        Tensor partial = tensor.partial(new int[]{0, 1}, new int[]{2, 3});
+        assertArrayEquals(new int[]{2, 2}, partial.getShape());
+        assertEquals(Arrays.asList(2.0, 3.0, 5.0, 6.0), partial.getData());
+    }
+
+    @Test
+    public void testPartialInvalidIndicesLength() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("startIndices and endIndices must match the number of dimensions.");
+        tensor.partial(new int[]{0}, new int[]{1});
+    }
+
+    @Test
+    public void testPartialInvalidIndicesRange() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        thrown.expect(IndexOutOfBoundsException.class);
+        thrown.expectMessage("Index [2, 0] is out of bounds for shape [2, 2].");
+        tensor.partial(new int[]{0, 0}, new int[]{3, 1});
+    }
+
+    @Test
+    public void testToStringMethod() {
+        List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
+        Tensor tensor = new Tensor(data);
+        assertEquals("Tensor(shape=[2, 2], data=[[1.0, 2.0], [3.0, 4.0]])", tensor.toString());
     }
 }
