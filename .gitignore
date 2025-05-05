@@ -54,3 +54,4 @@ release.properties
 pom.xml.releaseBackup
 pom.xml.tag
 .vscode/settings.json
+/out/artifacts/Math_jar/Math.jar
