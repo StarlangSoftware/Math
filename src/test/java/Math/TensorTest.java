@@ -56,8 +56,8 @@ public class TensorTest {
     public void testGetValidIndices() {
         List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
         Tensor tensor = new Tensor(data, new int[]{2, 2});
-        assertEquals(1.0, tensor.get(new int[]{0, 0}), 1e-9);
-        assertEquals(4.0, tensor.get(new int[]{1, 1}), 1e-9);
+        assertEquals(1.0, tensor.getValue(new int[]{0, 0}), 1e-9);
+        assertEquals(4.0, tensor.getValue(new int[]{1, 1}), 1e-9);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TensorTest {
         List<Double> data = Arrays.asList(1.0, 2.0);
         Tensor tensor = new Tensor(data, new int[]{2});
         thrown.expect(IndexOutOfBoundsException.class);
-        tensor.get(new int[]{2});
+        tensor.getValue(new int[]{2});
     }
 
     @Test
@@ -73,7 +73,7 @@ public class TensorTest {
         List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
         Tensor tensor = new Tensor(data, new int[]{2, 2});
         tensor.set(new int[]{0, 0}, 5.0);
-        assertEquals(5.0, tensor.get(new int[]{0, 0}), 1e-9);
+        assertEquals(5.0, tensor.getValue(new int[]{0, 0}), 1e-9);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class TensorTest {
     public void testBroadcastToValid() {
         List<Double> data = Arrays.asList(1.0, 2.0);
         Tensor tensor = new Tensor(data, new int[]{1, 2});
-        Tensor broadcasted = tensor.broadcast_to(new int[]{2, 2});
+        Tensor broadcasted = tensor.broadcastTo(new int[]{2, 2});
         assertArrayEquals(new int[]{2, 2}, broadcasted.getShape());
         assertEquals(Arrays.asList(1.0, 2.0, 1.0, 2.0), broadcasted.getData());
     }
@@ -153,7 +153,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data, new int[]{2});
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot broadcast shape [2] to [3]");
-        tensor.broadcast_to(new int[]{3});
+        tensor.broadcastTo(new int[]{3});
     }
 
     @Test
