@@ -194,15 +194,6 @@ public class Tensor {
         return data.get(flatIndex);
     }
 
-    public void setValue(int[] indices, double value) {
-        validateIndices(indices); // Ensure indices are valid
-        int flatIndex = 0;
-        for (int i = 0; i < indices.length; i++) {
-            flatIndex += indices[i] * strides[i];
-        }
-        data.set(flatIndex, value);
-    }
-
     /**
      * Sets the value at the given indices.
      *
