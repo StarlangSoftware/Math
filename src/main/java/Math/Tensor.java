@@ -306,23 +306,51 @@ public class Tensor {
      * @return Array representing the broadcasted shape.
      */
     private int[] broadcastShape(int[] shape1, int[] shape2) {
-        int len1 = shape1.length;
-        int len2 = shape2.length;
-        int maxLength = Math.max(len1, len2);
-        int[] resultShape = new int[maxLength];
+        // Reverse both shapes to align from the right
+        int[] reversedShape1 = new int[shape1.length];
+        int[] reversedShape2 = new int[shape2.length];
+        
+        for (int i = 0; i < shape1.length; i++) {
+            reversedShape1[i] = shape1[shape1.length - 1 - i];
+        }
+        for (int i = 0; i < shape2.length; i++) {
+            reversedShape2[i] = shape2[shape2.length - 1 - i];
+        }
+        
+        List<Integer> resultShape = new ArrayList<>();
+        
+        // Compare dimensions from the right
+        int maxLength = Math.max(shape1.length, shape2.length);
         for (int i = 0; i < maxLength; i++) {
-            int dim1 = (i < len1) ? shape1[len1 - 1 - i] : 1;
-            int dim2 = (i < len2) ? shape2[len2 - 1 - i] : 1;
-
+            int dim1 = (i < reversedShape1.length) ? reversedShape1[i] : 1;
+            int dim2 = (i < reversedShape2.length) ? reversedShape2[i] : 1;
+            
             if (dim1 == dim2) {
-                resultShape[maxLength - 1 - i] = dim1;
+                resultShape.add(dim1);
             } else if (dim1 == 1 || dim2 == 1) {
-                resultShape[maxLength - 1 - i] = Math.max(dim1, dim2);
+                resultShape.add(Math.max(dim1, dim2));
             } else {
                 throw new IllegalArgumentException("Shapes " + Arrays.toString(shape1) + " and " + Arrays.toString(shape2) + " are not broadcastable");
             }
         }
-        return resultShape;
+        
+        // Add remaining dimensions from shape1
+        for (int i = reversedShape2.length; i < reversedShape1.length; i++) {
+            resultShape.add(reversedShape1[i]);
+        }
+        
+        // Add remaining dimensions from shape2
+        for (int i = reversedShape1.length; i < reversedShape2.length; i++) {
+            resultShape.add(reversedShape2[i]);
+        }
+        
+        // Reverse back to get the final shape
+        int[] finalShape = new int[resultShape.size()];
+        for (int i = 0; i < resultShape.size(); i++) {
+            finalShape[i] = resultShape.get(resultShape.size() - 1 - i);
+        }
+        
+        return finalShape;
     }
 
     /**
@@ -370,11 +398,9 @@ public class Tensor {
         Tensor tensor2 = other.broadcastTo(broadcastShape);
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
-        int[] strides1 = tensor1.strides;
-        int[] strides2 = tensor2.strides;
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, strides1);
-            int[] indices2 = unflattenIndex(i, strides2);
+            int[] indices1 = unflattenIndex(i, tensor1.strides);
+            int[] indices2 = unflattenIndex(i, tensor2.strides);
             resultData.add(tensor1.getValue(indices1) + tensor2.getValue(indices2));
         }
         return new Tensor(resultData, broadcastShape);
@@ -392,11 +418,9 @@ public class Tensor {
         Tensor tensor2 = other.broadcastTo(broadcastShape);
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
-        int[] strides1 = tensor1.strides;
-        int[] strides2 = tensor2.strides;
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, strides1);
-            int[] indices2 = unflattenIndex(i, strides2);
+            int[] indices1 = unflattenIndex(i, tensor1.strides);
+            int[] indices2 = unflattenIndex(i, tensor2.strides);
             resultData.add(tensor1.getValue(indices1) - tensor2.getValue(indices2));
         }
         return new Tensor(resultData, broadcastShape);
@@ -408,65 +432,93 @@ public class Tensor {
      * @param other The other tensor to multiply.
      * @return New tensor with the result of the multiplication.
      */
-    public Tensor multiply(Tensor other) {
+    public Tensor hadamardProduct(Tensor other) {
         int[] broadcastShape = broadcastShape(this.shape, other.shape);
         Tensor tensor1 = this.broadcastTo(broadcastShape);
         Tensor tensor2 = other.broadcastTo(broadcastShape);
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
-        int[] strides1 = tensor1.strides;
-        int[] strides2 = tensor2.strides;
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, strides1);
-            int[] indices2 = unflattenIndex(i, strides2);
+            int[] indices1 = unflattenIndex(i, tensor1.strides);
+            int[] indices2 = unflattenIndex(i, tensor2.strides);
             resultData.add(tensor1.getValue(indices1) * tensor2.getValue(indices2));
         }
         return new Tensor(resultData, broadcastShape);
     }
 
     /**
-     * Computes the dot product of two tensors.
+     * Performs matrix multiplication (batched if necessary).
+     * For tensors of shape (..., M, K) and (..., K, N), returns (..., M, N).
      *
-     * @param other The other tensor to compute the dot product with.
-     * @return New tensor with the result of the dot product.
+     * @param other Tensor with shape compatible for matrix multiplication.
+     * @return Tensor resulting from matrix multiplication.
      */
-    public Tensor dot(Tensor other) {
+    public Tensor multiply(Tensor other) {
+        if (this.shape.length < 2 || other.shape.length < 2) {
+            throw new IllegalArgumentException("Shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape) + " are not aligned for multiplication.");
+        }
         if (this.shape[this.shape.length - 1] != other.shape[other.shape.length - 2]) {
-            throw new IllegalArgumentException("Shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape) + " are not aligned for dot product.");
+            throw new IllegalArgumentException("Shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape) + " are not aligned for multiplication.");
         }
-        int[] resultShape = Arrays.copyOf(this.shape, this.shape.length - 1);
-        int[] otherShapeWithoutLast = Arrays.copyOf(other.shape, other.shape.length - 1);
-        int[] resultShapeCombined = new int[resultShape.length + otherShapeWithoutLast.length];
-        System.arraycopy(resultShape, 0, resultShapeCombined, 0, resultShape.length);
-        System.arraycopy(otherShapeWithoutLast, 0, resultShapeCombined, resultShape.length, otherShapeWithoutLast.length);
-        int[] finalResultShape = Arrays.copyOf(resultShapeCombined, resultShapeCombined.length -1);
-        int[] lastDimension = {other.shape[other.shape.length - 1]};
-        int[] finalShape = new int[finalResultShape.length + lastDimension.length];
-        System.arraycopy(finalResultShape, 0, finalShape, 0, finalResultShape.length);
-        System.arraycopy(lastDimension, 0, finalShape, finalResultShape.length, lastDimension.length);
+
+        int[] batchShape = Arrays.copyOfRange(this.shape, 0, this.shape.length - 2);
+        int m = this.shape[this.shape.length - 2];
+        int k1 = this.shape[this.shape.length - 1];
+        int k2 = other.shape[other.shape.length - 2];
+        int n = other.shape[other.shape.length - 1];
+
+        if (k1 != k2) {
+            throw new IllegalArgumentException("Inner dimensions must match for matrix multiplication.");
+        }
+
+        // Broadcasting batch shape if necessary
+        int[] otherBatchShape = Arrays.copyOfRange(other.shape, 0, other.shape.length - 2);
+        int[] broadcastShape;
+        Tensor selfBroadcasted;
+        Tensor otherBroadcasted;
+        
+        if (!Arrays.equals(batchShape, otherBatchShape)) {
+            broadcastShape = broadcastShape(batchShape, otherBatchShape);
+            int[] selfBroadcastShape = concat(broadcastShape, new int[]{m, k1});
+            int[] otherBroadcastShape = concat(broadcastShape, new int[]{k2, n});
+            selfBroadcasted = this.broadcastTo(selfBroadcastShape);
+            otherBroadcasted = other.broadcastTo(otherBroadcastShape);
+        } else {
+            broadcastShape = batchShape;
+            selfBroadcasted = this;
+            otherBroadcasted = other;
+        }
+
+        int[] resultShape = concat(broadcastShape, new int[]{m, n});
         List<Double> resultData = new ArrayList<>();
-        int numResultElements = computeNumElements(finalShape);
-        int[] resultStrides = computeStrides(finalShape);
-        for (int i = 0; i < numResultElements; i++) {
-            int[] resultIndices = unflattenIndex(i, resultStrides);
-            double dotProduct = 0;
-            for (int k = 0; k < this.shape[this.shape.length - 1]; k++) {
-                int[] aIndices = Arrays.copyOf(resultIndices, resultIndices.length - 1);
-                int[] aIndicesWithK = Arrays.copyOf(aIndices, aIndices.length + 1);
-                aIndicesWithK[aIndices.length] = k;
-                int[] bIndices = new int[other.shape.length];
-                bIndices[0] = k;
-                for(int j = 1; j < resultIndices.length; j++) {
-                    bIndices[j] = resultIndices[resultIndices.length - 1];
-                }
-                if (other.shape.length > 1) {
-                    System.arraycopy(resultIndices, resultIndices.length - 1, bIndices, 1, 1);
-                }
-                dotProduct += this.getValue(aIndicesWithK) * other.getValue(bIndices);
+
+        for (int i = 0; i < computeNumElements(resultShape); i++) {
+            int[] indices = unflattenIndex(i, computeStrides(resultShape));
+            int[] batchIdx = Arrays.copyOfRange(indices, 0, indices.length - 2);
+            int row = indices[indices.length - 2];
+            int col = indices[indices.length - 1];
+
+            double sumResult = 0;
+            for (int k = 0; k < k1; k++) {
+                int[] aIdx = concat(batchIdx, new int[]{row, k});
+                int[] bIdx = concat(batchIdx, new int[]{k, col});
+                sumResult += selfBroadcasted.getValue(aIdx) * otherBroadcasted.getValue(bIdx);
             }
-            resultData.add(dotProduct);
+
+            resultData.add(sumResult);
         }
-        return new Tensor(resultData, finalShape);
+
+        return new Tensor(resultData, resultShape);
+    }
+
+    /**
+     * Helper method to concatenate two int arrays.
+     */
+    private int[] concat(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
     }
 
     /**
@@ -480,6 +532,7 @@ public class Tensor {
         if (startIndices.length != shape.length || endIndices.length != shape.length) {
             throw new IllegalArgumentException("startIndices and endIndices must match the number of dimensions.");
         }
+        
         // Compute the new shape of the extracted sub-tensor
         int[] newShape = new int[shape.length];
         for (int i = 0; i < shape.length; i++) {
@@ -488,6 +541,7 @@ public class Tensor {
                 throw new IllegalArgumentException("End index must be greater than or equal to start index for dimension " + i);
             }
         }
+        
         // Extract data from the original tensor
         List<Double> subData = new ArrayList<>();
         int numElements = computeNumElements(newShape);
@@ -511,8 +565,10 @@ public class Tensor {
      */
     @Override
     public String toString() {
-        return "Tensor(shape=" + Arrays.toString(shape) + ", data=" + formatTensor(data, shape) + ")";
+        Object formattedData = formatTensor(data, shape);
+        return "Tensor(shape=" + Arrays.toString(shape) + ", data=" + formattedData + ")";
     }
+    
     private Object formatTensor(List<Double> data, int[] shape) {
         if (shape.length == 1) {
             return data;
