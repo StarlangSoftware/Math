@@ -1,11 +1,10 @@
 package Math;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class Tensor {
+public class Tensor implements Serializable {
     /**
      * A class representing a multi-dimensional tensor that supports basic operations and broadcasting.
      */
@@ -65,6 +64,12 @@ public class Tensor {
         return new int[]{};
     }
 
+    /**
+     * Concatenates two tensors into a one.
+     *
+     * @param tensor to concatenate.
+     * @return Concatenated {@link Tensor}.
+     */
     public Tensor concat(Tensor tensor) {
         if (this.shape.length != tensor.shape.length) {
             throw new IllegalArgumentException("Dimensions length do not match.");
@@ -79,7 +84,7 @@ public class Tensor {
         int[] newShape = new int[this.shape.length];
         if (this.shape.length - 1 >= 0) System.arraycopy(this.shape, 0, newShape, 0, this.shape.length - 1);
         newShape[this.shape.length - 1] = this.shape[this.shape.length - 1] + tensor.shape[tensor.shape.length - 1];
-        List<Double> newList = new ArrayList<>();
+        ArrayList<Double> newList = new ArrayList<>();
         for (int i = 0; i < endIndex; i++) {
             for (int j = 0; j < this.shape[this.shape.length - 1]; j++) {
                 newList.add(this.data.get(i * this.shape[this.shape.length - 1] + j));
@@ -91,13 +96,18 @@ public class Tensor {
         return new Tensor(newList, newShape);
     }
 
+    /**
+     * Returns the sub-{@link Tensor} taking the given dimensions.
+     *
+     * @return a sub-{@link Tensor}.
+     */
     public Tensor get(int[] dimensions) {
         if (dimensions.length >= this.shape.length) {
-            throw new IllegalArgumentException("dimensions exceeds or same as the tensor's dimension.");
+            throw new IllegalArgumentException("Dimensions exceeds or same as the tensor's dimension.");
         }
         for (int i = 0; i < dimensions.length; i++) {
             if (dimensions[i] >= this.shape[i]) {
-                throw new IndexOutOfBoundsException("there is a dimension length exceed the tensor's dimension length.");
+                throw new IndexOutOfBoundsException("There is a dimension length exceed the tensor's dimension length.");
             }
         }
         int[] newShape = new int[this.shape.length - dimensions.length];
