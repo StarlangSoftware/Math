@@ -74,12 +74,12 @@ public class Tensor implements Serializable {
         if (this.shape.length != tensor.shape.length) {
             throw new IllegalArgumentException("Dimensions length do not match.");
         }
-        int endIndex = 0;
+        int endIndex = 1;
         for (int i = 0; i < this.shape.length - 1; i++) {
             if (this.shape[i] != tensor.shape[i]) {
                 throw new IllegalArgumentException("Dimensions do not match.");
             }
-            endIndex += this.shape[i];
+            endIndex *= this.shape[i];
         }
         int[] newShape = new int[this.shape.length];
         if (this.shape.length - 1 >= 0) System.arraycopy(this.shape, 0, newShape, 0, this.shape.length - 1);
