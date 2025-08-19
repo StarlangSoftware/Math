@@ -67,30 +67,44 @@ public class Tensor implements Serializable {
     /**
      * Concatenates two tensors into a one.
      *
-     * @param tensor to concatenate.
+     * @param tensor 2nd tensor for concatenation.
+     * @param dimension to concatenate.
      * @return Concatenated {@link Tensor}.
      */
-    public Tensor concat(Tensor tensor) {
+    public Tensor concat(Tensor tensor, int dimension) {
+        if (dimension >= this.shape.length) {
+            throw new IllegalArgumentException("Dimension out of bounds.");
+        }
         if (this.shape.length != tensor.shape.length) {
             throw new IllegalArgumentException("Dimensions length do not match.");
         }
+        int startIndex = 1;
         int endIndex = 1;
-        for (int i = 0; i < this.shape.length - 1; i++) {
-            if (this.shape[i] != tensor.shape[i]) {
+        for (int i = 0; i < this.shape.length; i++) {
+            if (i != dimension && this.shape[i] != tensor.shape[i]) {
                 throw new IllegalArgumentException("Dimensions do not match.");
             }
-            endIndex *= this.shape[i];
+            if (i >= dimension) {
+                endIndex *= this.shape[i];
+            } else {
+                startIndex *= this.shape[i];
+            }
         }
         int[] newShape = new int[this.shape.length];
-        if (this.shape.length - 1 >= 0) System.arraycopy(this.shape, 0, newShape, 0, this.shape.length - 1);
-        newShape[this.shape.length - 1] = this.shape[this.shape.length - 1] + tensor.shape[tensor.shape.length - 1];
-        ArrayList<Double> newList = new ArrayList<>();
-        for (int i = 0; i < endIndex; i++) {
-            for (int j = 0; j < this.shape[this.shape.length - 1]; j++) {
-                newList.add(this.data.get(i * this.shape[this.shape.length - 1] + j));
+        for (int i = 0; i < this.shape.length; i++) {
+            if (i == dimension) {
+                newShape[i] = this.shape[i] + tensor.shape[i];
+            } else {
+                newShape[i] = this.shape[i];
             }
-            for (int j = 0; j < tensor.shape[tensor.shape.length - 1]; j++) {
-                newList.add(tensor.data.get(i * tensor.shape[tensor.shape.length - 1] + j));
+        }
+        ArrayList<Double> newList = new ArrayList<>();
+        for (int i = 0; i < startIndex; i++) {
+            for (int j = 0; j < endIndex; j++) {
+                newList.add(this.data.get(i * endIndex + j));
+            }
+            for (int j = 0; j < endIndex; j++) {
+                newList.add(tensor.data.get(i * endIndex + j));
             }
         }
         return new Tensor(newList, newShape);
