@@ -79,13 +79,15 @@ public class Tensor implements Serializable {
             throw new IllegalArgumentException("Dimensions length do not match.");
         }
         int startIndex = 1;
-        int endIndex = 1;
+        int endIndex1 = 1;
+        int endIndex2 = 1;
         for (int i = 0; i < this.shape.length; i++) {
             if (i != dimension && this.shape[i] != tensor.shape[i]) {
                 throw new IllegalArgumentException("Dimensions do not match.");
             }
             if (i >= dimension) {
-                endIndex *= this.shape[i];
+                endIndex1 *= this.shape[i];
+                endIndex2 *= tensor.shape[i];
             } else {
                 startIndex *= this.shape[i];
             }
@@ -100,11 +102,11 @@ public class Tensor implements Serializable {
         }
         ArrayList<Double> newList = new ArrayList<>();
         for (int i = 0; i < startIndex; i++) {
-            for (int j = 0; j < endIndex; j++) {
-                newList.add(this.data.get(i * endIndex + j));
+            for (int j = 0; j < endIndex1; j++) {
+                newList.add(this.data.get(i * endIndex1 + j));
             }
-            for (int j = 0; j < endIndex; j++) {
-                newList.add(tensor.data.get(i * endIndex + j));
+            for (int j = 0; j < endIndex2; j++) {
+                newList.add(tensor.data.get(i * endIndex2 + j));
             }
         }
         return new Tensor(newList, newShape);
