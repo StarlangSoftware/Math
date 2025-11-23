@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 public class Tensor implements Serializable {
     /**
-     * A class representing a multi-dimensional tensor that supports basic operations and broadcasting.
+     * A class representing a multidimensional tensor that supports basic operations and broadcasting.
      */
 
     private final int[] shape;
@@ -425,9 +425,7 @@ public class Tensor implements Serializable {
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, tensor1.strides);
-            int[] indices2 = unflattenIndex(i, tensor2.strides);
-            resultData.add(tensor1.getValue(indices1) + tensor2.getValue(indices2));
+            resultData.add(tensor1.data.get(i) + tensor2.data.get(i));
         }
         return new Tensor(resultData, broadcastShape);
     }
@@ -445,9 +443,7 @@ public class Tensor implements Serializable {
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, tensor1.strides);
-            int[] indices2 = unflattenIndex(i, tensor2.strides);
-            resultData.add(tensor1.getValue(indices1) - tensor2.getValue(indices2));
+            resultData.add(tensor1.data.get(i) - tensor2.data.get(i));
         }
         return new Tensor(resultData, broadcastShape);
     }
@@ -465,9 +461,7 @@ public class Tensor implements Serializable {
         List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
         for (int i = 0; i < numElements; i++) {
-            int[] indices1 = unflattenIndex(i, tensor1.strides);
-            int[] indices2 = unflattenIndex(i, tensor2.strides);
-            resultData.add(tensor1.getValue(indices1) * tensor2.getValue(indices2));
+            resultData.add(tensor1.data.get(i) * tensor2.data.get(i));
         }
         return new Tensor(resultData, broadcastShape);
     }
