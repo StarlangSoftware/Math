@@ -19,7 +19,7 @@ public class TensorTest {
         List<List<Double>> data = Arrays.asList(Arrays.asList(1.0, 2.0), Arrays.asList(3.0, 4.0));
         Tensor tensor = new Tensor(data);
         assertArrayEquals(new int[]{2, 2}, tensor.getShape());
-        assertEquals(Arrays.asList(1.0, 2.0, 3.0, 4.0), tensor.getData());
+        assertArrayEquals(new double[]{1.0, 2.0, 3.0, 4.0}, tensor.getData(), 1e-9);
     }
 
     @Test
@@ -27,7 +27,7 @@ public class TensorTest {
         List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
         Tensor tensor = new Tensor(data, new int[]{2, 2});
         assertArrayEquals(new int[]{2, 2}, tensor.getShape());
-        assertEquals(Arrays.asList(1.0, 2.0, 3.0, 4.0), tensor.getData());
+        assertArrayEquals(new double[]{1.0, 2.0, 3.0, 4.0}, tensor.getData(), 1e-9);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class TensorTest {
     public void testGetData() {
         List<Double> data = Arrays.asList(1.0, 2.0, 3.0, 4.0);
         Tensor tensor = new Tensor(data, new int[]{2, 2});
-        assertEquals(data, tensor.getData());
+        assertArrayEquals(new double[]{1.0, 2.0, 3.0, 4.0}, tensor.getData(), 1e-9);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data, new int[]{2, 2});
         Tensor reshaped = tensor.reshape(new int[]{4});
         assertArrayEquals(new int[]{4}, reshaped.getShape());
-        assertEquals(data, reshaped.getData());
+        assertArrayEquals(new double[]{1.0, 2.0, 3.0, 4.0}, reshaped.getData(), 1e-9);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data);
         Tensor transposed = tensor.transpose(null);
         assertArrayEquals(new int[]{2, 2}, transposed.getShape());
-        assertEquals(Arrays.asList(1.0, 3.0, 2.0, 4.0), transposed.getData());
+        assertArrayEquals(new double[]{1.0, 3.0, 2.0, 4.0}, transposed.getData(), 1e-9);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data);
         Tensor transposed = tensor.transpose(new int[]{1, 0});
         assertArrayEquals(new int[]{3, 2}, transposed.getShape());
-        assertEquals(Arrays.asList(1.0, 4.0, 2.0, 5.0, 3.0, 6.0), transposed.getData());
+        assertArrayEquals(new double[]{1.0, 4.0, 2.0, 5.0, 3.0, 6.0}, transposed.getData(), 1e-9);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data, new int[]{1, 2});
         Tensor broadcasted = tensor.broadcastTo(new int[]{2, 2});
         assertArrayEquals(new int[]{2, 2}, broadcasted.getShape());
-        assertEquals(Arrays.asList(1.0, 2.0, 1.0, 2.0), broadcasted.getData());
+        assertArrayEquals(new double[]{1.0, 2.0, 1.0, 2.0}, broadcasted.getData(), 1e-9);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
         Tensor sum = tensor1.add(tensor2);
         assertArrayEquals(new int[]{2, 2}, sum.getShape());
-        assertEquals(Arrays.asList(6.0, 8.0, 10.0, 12.0), sum.getData());
+        assertArrayEquals(new double[]{6.0, 8.0, 10.0, 12.0}, sum.getData(), 1e-9);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{2, 1});
         Tensor sum = tensor1.add(tensor2);
         assertArrayEquals(new int[]{2, 2}, sum.getShape());
-        assertEquals(Arrays.asList(4.0, 5.0, 5.0, 6.0), sum.getData());
+        assertArrayEquals(new double[]{4.0, 5.0, 5.0, 6.0}, sum.getData(), 1e-9);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
         Tensor diff = tensor1.subtract(tensor2);
         assertArrayEquals(new int[]{2, 2}, diff.getShape());
-        assertEquals(Arrays.asList(4.0, 4.0, 4.0, 4.0), diff.getData());
+        assertArrayEquals(new double[]{4.0, 4.0, 4.0, 4.0}, diff.getData(), 1e-9);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{1, 2});
         Tensor diff = tensor1.subtract(tensor2);
         assertArrayEquals(new int[]{2, 2}, diff.getShape());
-        assertEquals(Arrays.asList(4.0, 3.0, 4.0, 3.0), diff.getData());
+        assertArrayEquals(new double[]{4.0, 3.0, 4.0, 3.0}, diff.getData(), 1e-9);
     }
 
     @Test
@@ -208,7 +208,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{2, 2});
         Tensor product = tensor1.hadamardProduct(tensor2);
         assertArrayEquals(new int[]{2, 2}, product.getShape());
-        assertEquals(Arrays.asList(5.0, 12.0, 21.0, 32.0), product.getData());
+        assertArrayEquals(new double[]{5.0, 12.0, 21.0, 32.0}, product.getData(), 1e-9);
     }
 
     @Test
@@ -219,7 +219,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2, new int[]{2, 1});
         Tensor product = tensor1.hadamardProduct(tensor2);
         assertArrayEquals(new int[]{2, 2}, product.getShape());
-        assertEquals(Arrays.asList(3.0, 6.0, 4.0, 8.0), product.getData());
+        assertArrayEquals(new double[]{3.0, 6.0, 4.0, 8.0}, product.getData(), 1e-9);
     }
 
     @Test
@@ -236,7 +236,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2);
         Tensor result = tensor1.multiply(tensor2);
         assertArrayEquals(new int[]{2, 2}, result.getShape());
-        assertEquals(Arrays.asList(19.0, 22.0, 43.0, 50.0), result.getData());
+        assertArrayEquals(new double[]{19.0, 22.0, 43.0, 50.0}, result.getData(), 1e-9);
     }
 
     @Test
@@ -253,7 +253,7 @@ public class TensorTest {
         Tensor tensor2 = new Tensor(data2);
         Tensor result = tensor1.multiply(tensor2);
         assertArrayEquals(new int[]{2, 2, 2}, result.getShape());
-        assertEquals(Arrays.asList(19.0, 22.0, 43.0, 50.0, 267.0, 286.0, 323.0, 346.0), result.getData());
+        assertArrayEquals(new double[]{19.0, 22.0, 43.0, 50.0, 267.0, 286.0, 323.0, 346.0}, result.getData(), 1e-9);
     }
 
     @Test
@@ -269,7 +269,6 @@ public class TensorTest {
 
     @Test
     public void testMatrixMultiplyUnsupportedDimensions() {
-        // Test with 1D tensors (not supported)
         List<Double> data1 = Arrays.asList(1.0, 2.0);
         Tensor tensor1 = new Tensor(data1, new int[]{2});
         List<Double> data2 = Arrays.asList(3.0, 4.0);
@@ -289,7 +288,7 @@ public class TensorTest {
         Tensor tensor = new Tensor(data);
         Tensor partial = tensor.partial(new int[]{0, 1}, new int[]{2, 3});
         assertArrayEquals(new int[]{2, 2}, partial.getShape());
-        assertEquals(Arrays.asList(2.0, 3.0, 5.0, 6.0), partial.getData());
+        assertArrayEquals(new double[]{2.0, 3.0, 5.0, 6.0}, partial.getData(), 1e-9);
     }
 
     @Test

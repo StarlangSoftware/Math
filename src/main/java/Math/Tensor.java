@@ -11,10 +11,27 @@ public class Tensor implements Serializable {
 
     private final int[] shape;
     private final int[] strides;
-    private final ArrayList<Double> data;
+    private final double[] data;
 
     /**
-     * Initializes the tensor with given data and shape.
+     * Initializes the tensor directly with a primitive double array and shape.
+     * This is the fastest constructor used for internal mathematical operations.
+     *
+     * @param data  Primitive array representing the flattened tensor data.
+     * @param shape The shape of the tensor.
+     */
+    public Tensor(double[] data, int[] shape) {
+        this.shape = shape;
+        this.data = data;
+        int totalElements = this.data.length;
+        if (computeNumElements(this.shape) != totalElements) {
+            throw new IllegalArgumentException("Shape does not match the number of elements in data.");
+        }
+        this.strides = computeStrides(this.shape);
+    }
+
+    /**
+     * Initializes the tensor with given nested list data and shape.
      *
      * @param data  Nested lists representing the tensor data.
      * @param shape The shape of the tensor. If null, the shape is inferred from the data.
@@ -25,9 +42,9 @@ public class Tensor implements Serializable {
         } else {
             this.shape = shape;
         }
-        this.data = flatten(data);
-        int totalElements = this.data.size();
-        if (computeNumElements(this.shape) != totalElements) {
+        int totalElements = computeNumElements(this.shape);
+        this.data = new double[totalElements];
+        if (flatten(data, this.data, new int[]{0}) != totalElements) {
             throw new IllegalArgumentException("Shape does not match the number of elements in data.");
         }
         this.strides = computeStrides(this.shape);
@@ -57,7 +74,6 @@ public class Tensor implements Serializable {
                 System.arraycopy(restOfShape, 0, shape, 1, restOfShape.length);
                 return shape;
             } else {
-                // If the first element is not a list, then it's the innermost dimension
                 return new int[]{data.size()};
             }
         }
@@ -100,16 +116,17 @@ public class Tensor implements Serializable {
                 newShape[i] = this.shape[i];
             }
         }
-        ArrayList<Double> newList = new ArrayList<>();
+        double[] newData = new double[startIndex * (endIndex1 + endIndex2)];
+        int ptr = 0;
         for (int i = 0; i < startIndex; i++) {
             for (int j = 0; j < endIndex1; j++) {
-                newList.add(this.data.get(i * endIndex1 + j));
+                newData[ptr++] = this.data[i * endIndex1 + j];
             }
             for (int j = 0; j < endIndex2; j++) {
-                newList.add(tensor.data.get(i * endIndex2 + j));
+                newData[ptr++] = tensor.data[i * endIndex2 + j];
             }
         }
-        return new Tensor(newList, newShape);
+        return new Tensor(newData, newShape);
     }
 
     /**
@@ -128,43 +145,40 @@ public class Tensor implements Serializable {
         }
         int[] newShape = new int[this.shape.length - dimensions.length];
         System.arraycopy(this.shape, dimensions.length, newShape, 0, newShape.length);
-        int i = 0, start = 0, end = data.size();
+        int i = 0, start = 0, end = data.length;
         do {
             int parts = (end - start) / this.shape[i];
             start += parts * dimensions[i];
             end = start + parts;
             i++;
         } while (i < dimensions.length);
-        return new Tensor(data.subList(start, end),  newShape);
+        double[] newData = new double[end - start];
+        System.arraycopy(this.data, start, newData, 0, end - start);
+        return new Tensor(newData, newShape);
     }
 
     /**
-     * Flattens nested lists into a single list.
+     * Flattens nested lists directly into the primitive double array.
      *
-     * @param data Nested lists representing the tensor data.
-     * @return Flattened list of tensor elements.
+     * @param dataList Nested lists representing the tensor data.
+     * @param flatData The target primitive array.
+     * @param index    An array of size 1 keeping track of the current insertion index.
      */
-    private ArrayList<Double> flatten(List<?> data) {
-        ArrayList<Double> flattenedList = new ArrayList<>();
-        if (data instanceof List) {
-            for (Object item : data) {
-                if (item instanceof List) {
-                    flattenedList.addAll(flatten((List<?>) item));
-                } else if (item instanceof Number) {
-                    flattenedList.add(((Number) item).doubleValue());
-                }
+    private int flatten(List<?> dataList, double[] flatData, int[] index) {
+        int totalElements = 0;
+        for (Object item : dataList) {
+            if (item instanceof List) {
+                totalElements += flatten((List<?>) item, flatData, index);
+            } else if (item instanceof Number) {
+                totalElements++;
+                flatData[index[0]++] = ((Number) item).doubleValue();
             }
-        } else if (data instanceof Number) {
-            flattenedList.add(((Number) data).doubleValue());
         }
-        return flattenedList;
+        return totalElements;
     }
 
     /**
      * Computes the strides for each dimension based on the shape.
-     *
-     * @param shape Array representing the tensor shape.
-     * @return Array representing the strides.
      */
     private int[] computeStrides(int[] shape) {
         int[] strides = new int[shape.length];
@@ -178,9 +192,6 @@ public class Tensor implements Serializable {
 
     /**
      * Computes the total number of elements in the tensor based on its shape.
-     *
-     * @param shape Array representing the tensor shape.
-     * @return Total number of elements.
      */
     private int computeNumElements(int[] shape) {
         int product = 1;
@@ -192,7 +203,6 @@ public class Tensor implements Serializable {
 
     /**
      * Validates that indices are within the valid range for each dimension.
-     * @param indices Array of indices specifying the position.
      */
     private void validateIndices(int[] indices) {
         if (indices.length != shape.length) {
@@ -207,39 +217,30 @@ public class Tensor implements Serializable {
 
     /**
      * Retrieves the value at the given indices.
-     *
-     * @param indices Array of indices specifying the position.
-     * @return Value at the specified position.
      */
     public double getValue(int[] indices) {
-        validateIndices(indices); // Ensure indices are valid
+        validateIndices(indices);
         int flatIndex = 0;
         for (int i = 0; i < indices.length; i++) {
             flatIndex += indices[i] * strides[i];
         }
-        return data.get(flatIndex);
+        return data[flatIndex];
     }
 
     /**
      * Sets the value at the given indices.
-     *
-     * @param indices Array of indices specifying the position.
-     * @param value   Value to set at the specified position.
      */
     public void set(int[] indices, double value) {
-        validateIndices(indices); // Ensure indices are valid
+        validateIndices(indices);
         int flatIndex = 0;
         for (int i = 0; i < indices.length; i++) {
             flatIndex += indices[i] * strides[i];
         }
-        data.set(flatIndex, value);
+        data[flatIndex] = value;
     }
 
     /**
-     * Reshapes the tensor to the specified new shape.
-     *
-     * @param newShape Array representing the new shape.
-     * @return New tensor with the specified shape.
+     * Reshapes the tensor to the specified new shape. Memory is shared!
      */
     public Tensor reshape(int[] newShape) {
         if (computeNumElements(newShape) != computeNumElements(this.shape)) {
@@ -250,9 +251,6 @@ public class Tensor implements Serializable {
 
     /**
      * Transposes the tensor according to the specified axes.
-     *
-     * @param axes Array representing the order of axes. If null, reverses the axes.
-     * @return New tensor with transposed axes.
      */
     public Tensor transpose(int[] axes) {
         if (axes == null) {
@@ -273,21 +271,17 @@ public class Tensor implements Serializable {
         for (int i = 0; i < axes.length; i++) {
             newShape[i] = shape[axes[i]];
         }
-        List<Double> flattenedData = transposeFlattenedData(axes, newShape);
+        double[] flattenedData = transposeFlattenedData(axes, newShape);
         return new Tensor(flattenedData, newShape);
     }
 
     /**
      * Rearranges the flattened data for transposition.
-     *
-     * @param axes     Array representing the order of axes.
-     * @param newShape Array representing the new shape.
-     * @return Flattened list of transposed data.
      */
-    private List<Double> transposeFlattenedData(int[] axes, int[] newShape) {
+    private double[] transposeFlattenedData(int[] axes, int[] newShape) {
         int[] newStrides = computeStrides(newShape);
-        List<Double> flattenedData = new ArrayList<>();
         int numElements = computeNumElements(newShape);
+        double[] flattenedData = new double[numElements];
         for (int i = 0; i < numElements; i++) {
             int[] newIndices = unflattenIndex(i, newStrides);
             int[] originalIndices = new int[shape.length];
@@ -303,18 +297,11 @@ public class Tensor implements Serializable {
                     originalIndices[dim] = newIndices[originalDimIndex];
                 }
             }
-            flattenedData.add(getValue(originalIndices));
+            flattenedData[i] = getValue(originalIndices);
         }
         return flattenedData;
     }
 
-    /**
-     * Converts a flat index to multi-dimensional indices based on strides.
-     *
-     * @param flatIndex The flat index to convert.
-     * @param strides   Array representing the strides.
-     * @return Array of multi-dimensional indices.
-     */
     private int[] unflattenIndex(int flatIndex, int[] strides) {
         int[] indices = new int[strides.length];
         for (int i = 0; i < strides.length; i++) {
@@ -324,33 +311,20 @@ public class Tensor implements Serializable {
         return indices;
     }
 
-    /**
-     * Determines the broadcasted shape of two tensors.
-     *
-     * @param shape1 Array representing the first tensor shape.
-     * @param shape2 Array representing the second tensor shape.
-     * @return Array representing the broadcasted shape.
-     */
     private int[] broadcastShape(int[] shape1, int[] shape2) {
-        // Reverse both shapes to align from the right
         int[] reversedShape1 = new int[shape1.length];
         int[] reversedShape2 = new int[shape2.length];
-        
         for (int i = 0; i < shape1.length; i++) {
             reversedShape1[i] = shape1[shape1.length - 1 - i];
         }
         for (int i = 0; i < shape2.length; i++) {
             reversedShape2[i] = shape2[shape2.length - 1 - i];
         }
-        
         List<Integer> resultShape = new ArrayList<>();
-        
-        // Compare dimensions from the right
         int maxLength = Math.max(shape1.length, shape2.length);
         for (int i = 0; i < maxLength; i++) {
             int dim1 = (i < reversedShape1.length) ? reversedShape1[i] : 1;
             int dim2 = (i < reversedShape2.length) ? reversedShape2[i] : 1;
-            
             if (dim1 == dim2) {
                 resultShape.add(dim1);
             } else if (dim1 == 1 || dim2 == 1) {
@@ -359,32 +333,19 @@ public class Tensor implements Serializable {
                 throw new IllegalArgumentException("Shapes " + Arrays.toString(shape1) + " and " + Arrays.toString(shape2) + " are not broadcastable");
             }
         }
-        
-        // Add remaining dimensions from shape1
         for (int i = reversedShape2.length; i < reversedShape1.length; i++) {
             resultShape.add(reversedShape1[i]);
         }
-        
-        // Add remaining dimensions from shape2
         for (int i = reversedShape1.length; i < reversedShape2.length; i++) {
             resultShape.add(reversedShape2[i]);
         }
-        
-        // Reverse back to get the final shape
         int[] finalShape = new int[resultShape.size()];
         for (int i = 0; i < resultShape.size(); i++) {
             finalShape[i] = resultShape.get(resultShape.size() - 1 - i);
         }
-        
         return finalShape;
     }
 
-    /**
-     * Broadcasts the tensor to the specified target shape.
-     *
-     * @param targetShape Array representing the target shape.
-     * @return New tensor with the target shape.
-     */
     public Tensor broadcastTo(int[] targetShape) {
         int diff = targetShape.length - shape.length;
         int[] expandedShape = new int[targetShape.length];
@@ -392,14 +353,13 @@ public class Tensor implements Serializable {
             expandedShape[i] = 1;
         }
         System.arraycopy(shape, 0, expandedShape, diff, shape.length);
-
         for (int i = 0; i < targetShape.length; i++) {
             if (!(expandedShape[i] == targetShape[i] || expandedShape[i] == 1)) {
                 throw new IllegalArgumentException("Cannot broadcast shape " + Arrays.toString(shape) + " to " + Arrays.toString(targetShape));
             }
         }
-        List<Double> newData = new ArrayList<>();
         int numElements = computeNumElements(targetShape);
+        double[] newData = new double[numElements];
         int[] targetStrides = computeStrides(targetShape);
         for (int i = 0; i < numElements; i++) {
             int[] indices = unflattenIndex(i, targetStrides);
@@ -407,72 +367,47 @@ public class Tensor implements Serializable {
             for (int j = 0; j < indices.length; j++) {
                 originalIndices[j] = (expandedShape[j] > 1) ? indices[j] : 0;
             }
-            newData.add(getValue(originalIndices));
+            newData[i] = getValue(originalIndices);
         }
         return new Tensor(newData, targetShape);
     }
 
-    /**
-     * Adds two tensors element-wise with broadcasting.
-     *
-     * @param other The other tensor to add.
-     * @return New tensor with the result of the addition.
-     */
     public Tensor add(Tensor other) {
         int[] broadcastShape = broadcastShape(this.shape, other.shape);
         Tensor tensor1 = this.broadcastTo(broadcastShape);
         Tensor tensor2 = other.broadcastTo(broadcastShape);
-        List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
+        double[] resultData = new double[numElements];
         for (int i = 0; i < numElements; i++) {
-            resultData.add(tensor1.data.get(i) + tensor2.data.get(i));
+            resultData[i] = tensor1.data[i] + tensor2.data[i];
         }
         return new Tensor(resultData, broadcastShape);
     }
 
-    /**
-     * Subtracts one tensor from another element-wise with broadcasting.
-     *
-     * @param other The other tensor to subtract.
-     * @return New tensor with the result of the subtraction.
-     */
     public Tensor subtract(Tensor other) {
         int[] broadcastShape = broadcastShape(this.shape, other.shape);
         Tensor tensor1 = this.broadcastTo(broadcastShape);
         Tensor tensor2 = other.broadcastTo(broadcastShape);
-        List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
+        double[] resultData = new double[numElements];
         for (int i = 0; i < numElements; i++) {
-            resultData.add(tensor1.data.get(i) - tensor2.data.get(i));
+            resultData[i] = tensor1.data[i] - tensor2.data[i];
         }
         return new Tensor(resultData, broadcastShape);
     }
 
-    /**
-     * Multiplies two tensors element-wise with broadcasting.
-     *
-     * @param other The other tensor to multiply.
-     * @return New tensor with the result of the multiplication.
-     */
     public Tensor hadamardProduct(Tensor other) {
         int[] broadcastShape = broadcastShape(this.shape, other.shape);
         Tensor tensor1 = this.broadcastTo(broadcastShape);
         Tensor tensor2 = other.broadcastTo(broadcastShape);
-        List<Double> resultData = new ArrayList<>();
         int numElements = computeNumElements(broadcastShape);
+        double[] resultData = new double[numElements];
         for (int i = 0; i < numElements; i++) {
-            resultData.add(tensor1.data.get(i) * tensor2.data.get(i));
+            resultData[i] = tensor1.data[i] * tensor2.data[i];
         }
         return new Tensor(resultData, broadcastShape);
     }
 
-    /**
-     * Performs matrix multiplication (batched if necessary).
-     * For tensors of shape (..., M, K) and (..., K, N), returns (..., M, N).
-     *
-     * @param other Tensor with shape compatible for matrix multiplication.
-     * @return Tensor resulting from matrix multiplication.
-     */
     public Tensor multiply(Tensor other) {
         if (this.shape.length < 2 || other.shape.length < 2) {
             throw new IllegalArgumentException("Shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape) + " are not aligned for multiplication.");
@@ -480,23 +415,18 @@ public class Tensor implements Serializable {
         if (this.shape[this.shape.length - 1] != other.shape[other.shape.length - 2]) {
             throw new IllegalArgumentException("Shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape) + " are not aligned for multiplication.");
         }
-
         int[] batchShape = Arrays.copyOfRange(this.shape, 0, this.shape.length - 2);
         int m = this.shape[this.shape.length - 2];
         int k1 = this.shape[this.shape.length - 1];
         int k2 = other.shape[other.shape.length - 2];
         int n = other.shape[other.shape.length - 1];
-
         if (k1 != k2) {
             throw new IllegalArgumentException("Inner dimensions must match for matrix multiplication.");
         }
-
-        // Broadcasting batch shape if necessary
         int[] otherBatchShape = Arrays.copyOfRange(other.shape, 0, other.shape.length - 2);
         int[] broadcastShape;
         Tensor selfBroadcasted;
         Tensor otherBroadcasted;
-        
         if (!Arrays.equals(batchShape, otherBatchShape)) {
             broadcastShape = broadcastShape(batchShape, otherBatchShape);
             int[] selfBroadcastShape = concat(broadcastShape, new int[]{m, k1});
@@ -508,32 +438,26 @@ public class Tensor implements Serializable {
             selfBroadcasted = this;
             otherBroadcasted = other;
         }
-
         int[] resultShape = concat(broadcastShape, new int[]{m, n});
-        List<Double> resultData = new ArrayList<>();
-
-        for (int i = 0; i < computeNumElements(resultShape); i++) {
-            int[] indices = unflattenIndex(i, computeStrides(resultShape));
+        int numElements = computeNumElements(resultShape);
+        double[] resultData = new double[numElements];
+        int[] resultStrides = computeStrides(resultShape);
+        for (int i = 0; i < numElements; i++) {
+            int[] indices = unflattenIndex(i, resultStrides);
             int[] batchIdx = Arrays.copyOfRange(indices, 0, indices.length - 2);
             int row = indices[indices.length - 2];
             int col = indices[indices.length - 1];
-
             double sumResult = 0;
             for (int k = 0; k < k1; k++) {
                 int[] aIdx = concat(batchIdx, new int[]{row, k});
                 int[] bIdx = concat(batchIdx, new int[]{k, col});
                 sumResult += selfBroadcasted.getValue(aIdx) * otherBroadcasted.getValue(bIdx);
             }
-
-            resultData.add(sumResult);
+            resultData[i] = sumResult;
         }
-
         return new Tensor(resultData, resultShape);
     }
 
-    /**
-     * Helper method to concatenate two int arrays.
-     */
     private int[] concat(int[] a, int[] b) {
         int[] result = new int[a.length + b.length];
         System.arraycopy(a, 0, result, 0, a.length);
@@ -541,19 +465,10 @@ public class Tensor implements Serializable {
         return result;
     }
 
-    /**
-     * Extracts a sub-tensor from the given start indices to the end indices.
-     *
-     * @param startIndices Array specifying the start indices for each dimension.
-     * @param endIndices   Array specifying the end indices (exclusive) for each dimension.
-     * @return A new Tensor containing the extracted sub-tensor.
-     */
     public Tensor partial(int[] startIndices, int[] endIndices) {
         if (startIndices.length != shape.length || endIndices.length != shape.length) {
             throw new IllegalArgumentException("startIndices and endIndices must match the number of dimensions.");
         }
-        
-        // Compute the new shape of the extracted sub-tensor
         int[] newShape = new int[shape.length];
         for (int i = 0; i < shape.length; i++) {
             newShape[i] = endIndices[i] - startIndices[i];
@@ -561,42 +476,39 @@ public class Tensor implements Serializable {
                 throw new IllegalArgumentException("End index must be greater than or equal to start index for dimension " + i);
             }
         }
-        
-        // Extract data from the original tensor
-        List<Double> subData = new ArrayList<>();
         int numElements = computeNumElements(newShape);
+        double[] subData = new double[numElements];
         int[] newStrides = computeStrides(newShape);
-
         for (int i = 0; i < numElements; i++) {
             int[] subIndices = unflattenIndex(i, newStrides);
             int[] originalIndices = new int[shape.length];
             for (int j = 0; j < shape.length; j++) {
                 originalIndices[j] = startIndices[j] + subIndices[j];
             }
-            subData.add(getValue(originalIndices));
+            subData[i] = getValue(originalIndices);
         }
         return new Tensor(subData, newShape);
     }
 
-    /**
-     * Returns a string representation of the tensor.
-     *
-     * @return String representing the tensor.
-     */
     @Override
     public String toString() {
-        Object formattedData = formatTensor(data, shape);
+        Object formattedData = formatTensor(data, shape, 0);
         return "Tensor(shape=" + Arrays.toString(shape) + ", data=" + formattedData + ")";
     }
-    
-    private Object formatTensor(List<Double> data, int[] shape) {
+
+    private Object formatTensor(double[] dataArray, int[] shape, int offset) {
+        if (shape.length == 0) return new ArrayList<>();
         if (shape.length == 1) {
-            return data;
+            List<Double> row = new ArrayList<>(shape[0]);
+            for (int i = 0; i < shape[0]; i++) {
+                row.add(dataArray[offset + i]);
+            }
+            return row;
         }
         int stride = computeNumElements(Arrays.copyOfRange(shape, 1, shape.length));
-        List<Object> formattedList = new ArrayList<>();
+        List<Object> formattedList = new ArrayList<>(shape[0]);
         for (int i = 0; i < shape[0]; i++) {
-            formattedList.add(formatTensor(data.subList(i * stride, (i + 1) * stride), Arrays.copyOfRange(shape, 1, shape.length)));
+            formattedList.add(formatTensor(dataArray, Arrays.copyOfRange(shape, 1, shape.length), offset + (i * stride)));
         }
         return formattedList;
     }
@@ -605,7 +517,11 @@ public class Tensor implements Serializable {
         return shape;
     }
 
-    public List<Double> getData() {
+    /**
+     * Returns the primitive double array holding the tensor data.
+     * WARNING: Be cautious not to mutate this array directly outside the class if you want to maintain immutability.
+     */
+    public double[] getData() {
         return data;
     }
 }
